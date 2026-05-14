@@ -1,0 +1,55 @@
+name: 🐛 Bug Report
+description: Report an issue with the documentation site (broken links, incorrect content, rendering errors, etc.)
+title: "[Bug]: "
+labels: [bug]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug. Please fill out the following details.
+
+  - type: input
+    id: page
+    attributes:
+      label: Affected Page / URL
+      description: Which page or section is affected?
+      placeholder: "e.g., /getting-started, /services/s3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Issue Type
+      options:
+        - "Incorrect content"
+        - "Broken link"
+        - "Rendering / layout error"
+        - "Missing content"
+        - "Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What's wrong?
+      placeholder: Describe the issue clearly.
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested Fix
+      description: How should it be corrected?
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched existing issues to avoid duplicates.
+        - label: I have described the issue clearly.

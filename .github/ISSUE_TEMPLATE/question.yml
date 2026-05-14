@@ -1,0 +1,32 @@
+name: ❓ Question
+description: Ask a question about the documentation or the kumolo project
+title: "[Question]: "
+labels: [question]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for your question!
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What are you trying to do, and what are you unsure about?
+    validations:
+      required: true
+
+  - type: textarea
+    id: attempts
+    attributes:
+      label: What have you tried?
+      description: Let us know what you've already looked into or attempted.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched existing issues for similar questions.
+        - label: I have described my question clearly.

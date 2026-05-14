@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
 export default defineConfig({
-	site: 'https://optiflowic.github.io/kumolo-docs',
+	site: 'https://optiflowic.github.io',
 	base: '/kumolo-docs',
 	integrations: [
 		starlight({

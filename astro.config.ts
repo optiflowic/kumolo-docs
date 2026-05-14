@@ -4,6 +4,8 @@ import starlight from '@astrojs/starlight';
 export default defineConfig({
 	site: 'https://optiflowic.github.io',
 	base: '/kumolo-docs',
+	output: 'static',
+	trailingSlash: 'always',
 	integrations: [
 		starlight({
 			title: 'kumolo',

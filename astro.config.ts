@@ -7,6 +7,10 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'kumolo',
+			logo: {
+				src: './src/assets/logo.png',
+				alt: 'kumolo',
+			},
 			social: [
 				{
 					icon: 'github',

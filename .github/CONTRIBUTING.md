@@ -22,7 +22,7 @@ We welcome content improvements, corrections, new pages, and other suggestions.
 
 ## 💻 Local Development
 
-Node.js 20+ is required.
+Node.js 24+ is required.
 
 ```bash
 npm install

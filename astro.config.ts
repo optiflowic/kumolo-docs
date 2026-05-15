@@ -9,6 +9,7 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'kumolo',
+			favicon: '/favicon.png',
 			logo: {
 				src: './src/assets/logo.png',
 				alt: 'kumolo',

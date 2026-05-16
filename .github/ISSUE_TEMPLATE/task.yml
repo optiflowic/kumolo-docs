@@ -1,6 +1,6 @@
 name: ✅ Task
 description: Propose or track a specific task or action item
-title: "[Task]: "
+title: '[Task]: '
 labels: [task]
 
 body:

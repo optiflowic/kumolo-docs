@@ -1,6 +1,6 @@
 name: ❓ Question
 description: Ask a question about the documentation or the kumolo project
-title: "[Question]: "
+title: '[Question]: '
 labels: [question]
 
 body:

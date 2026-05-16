@@ -17,11 +17,11 @@ Open `http://localhost:4321/kumolo-docs` in your browser.
 
 ## Commands
 
-| Command           | Action                              |
-| :---------------- | :---------------------------------- |
-| `npm run dev`     | Start local dev server              |
-| `npm run build`   | Build for production                |
-| `npm run preview` | Preview production build locally    |
+| Command           | Action                           |
+| :---------------- | :------------------------------- |
+| `npm run dev`     | Start local dev server           |
+| `npm run build`   | Build for production             |
+| `npm run preview` | Preview production build locally |
 
 ## Contributing
 

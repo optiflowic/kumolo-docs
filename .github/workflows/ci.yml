@@ -25,4 +25,4 @@ jobs:
           purge-prefixes: nix-${{ runner.os }}-
           purge-last-accessed: 604800
 
-      - run: nix develop --command bash -c "npm ci && npm run build"
+      - run: nix develop --command bash -c "npm ci && npm run format:check && npm run build"

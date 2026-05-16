@@ -28,7 +28,7 @@ jobs:
           purge-prefixes: nix-${{ runner.os }}-
           purge-last-accessed: 604800
 
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
 
       - run: nix develop --command npm ci
 

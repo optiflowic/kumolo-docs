@@ -3,22 +3,30 @@ title: Getting Started
 description: Install and configure kumolo for local development.
 ---
 
-import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Tabs, TabItem, LinkCard, CardGrid } from '@astrojs/starlight/components';
 
 kumolo runs as a local HTTP server that accepts standard AWS SDK v2 requests.
 This guide gets you from zero to a working S3 or DynamoDB client in under five minutes.
+
+## Prerequisites
+
+| Method         | Requirement             |
+|----------------|-------------------------|
+| Docker         | Docker 20.10+           |
+| Docker Compose | Docker Compose v2       |
+| Binary         | No dependencies         |
 
 ## Installation
 
 <Tabs>
   <TabItem label="Docker">
-    Run kumolo in a single command. Data is stored in memory and discarded when the container stops.
+    Run kumolo with a single command. Data lives in a temporary directory and is discarded when the container stops.
 
     ```bash
     docker run -p 5566:5566 ghcr.io/optiflowic/kumolo:latest
     ```
 
-    To persist data across restarts, mount a volume:
+    To persist data across container restarts, mount a volume:
 
     ```bash
     docker run -p 5566:5566 \
@@ -26,6 +34,10 @@ This guide gets you from zero to a working S3 or DynamoDB client in under five m
       -e KUMOLO_DATA_DIR=/data \
       ghcr.io/optiflowic/kumolo:latest
     ```
+
+    :::tip
+    Omitting `KUMOLO_DATA_DIR` is fine for short-lived tests — kumolo creates a temp directory automatically and cleans it up on exit.
+    :::
   </TabItem>
   <TabItem label="Docker Compose">
     Add kumolo as a service in your `compose.yaml`:
@@ -51,13 +63,13 @@ This guide gets you from zero to a working S3 or DynamoDB client in under five m
   </TabItem>
   <TabItem label="Binary">
     Download the latest binary for your platform from the
-    [GitHub Releases](https://github.com/optiflowic/kumolo/releases) page and run:
+    [GitHub Releases](https://github.com/optiflowic/kumolo/releases) page, then run:
 
     ```bash
     ./kumolo
     ```
 
-    You can also set options via flags:
+    Options are also available as CLI flags:
 
     ```bash
     ./kumolo -port 5566 -data-dir ./data -log-level debug
@@ -65,15 +77,30 @@ This guide gets you from zero to a working S3 or DynamoDB client in under five m
   </TabItem>
 </Tabs>
 
-Once started, kumolo listens on `http://localhost:5566`.
+## Verify the server is running
+
+Once started, kumolo listens on port `5566`. Confirm it is up with:
+
+```bash
+curl -I http://localhost:5566/
+```
+
+You should receive a `404` response — that is expected. Any HTTP response confirms kumolo is accepting connections.
 
 ## Connecting your AWS SDK
 
 Point your AWS SDK at `http://localhost:5566`. No real AWS credentials are required —
 kumolo accepts any non-empty key/secret pair.
 
+:::note
+Always set a region (e.g. `us-east-1`). kumolo does not validate the region value, but
+the AWS SDK requires one to be present.
+:::
+
 <Tabs>
   <TabItem label="Go">
+    **S3**
+
     ```go
     import (
         "context"
@@ -94,15 +121,31 @@ kumolo accepts any non-empty key/secret pair.
         panic(err)
     }
 
-    client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+    s3Client := s3.NewFromConfig(cfg, func(o *s3.Options) {
         o.BaseEndpoint = aws.String("http://localhost:5566")
         o.UsePathStyle = true
     })
     ```
 
-    The same `BaseEndpoint` / `UsePathStyle` pattern applies to DynamoDB, STS, and all other supported services.
+    **DynamoDB**
+
+    ```go
+    import (
+        "github.com/aws/aws-sdk-go-v2/service/dynamodb"
+    )
+
+    ddbClient := dynamodb.NewFromConfig(cfg, func(o *dynamodb.Options) {
+        o.BaseEndpoint = aws.String("http://localhost:5566")
+    })
+    ```
+
+    :::tip
+    `UsePathStyle` is only required for S3. DynamoDB and STS clients work with `BaseEndpoint` alone.
+    :::
   </TabItem>
   <TabItem label="Python (boto3)">
+    **S3**
+
     ```python
     import boto3
 
@@ -114,15 +157,29 @@ kumolo accepts any non-empty key/secret pair.
         aws_secret_access_key="test",
     )
     ```
+
+    **DynamoDB**
+
+    ```python
+    dynamodb = boto3.client(
+        "dynamodb",
+        region_name="us-east-1",
+        endpoint_url="http://localhost:5566",
+        aws_access_key_id="test",
+        aws_secret_access_key="test",
+    )
+    ```
   </TabItem>
   <TabItem label="AWS CLI">
+    Pass `--endpoint-url` to any command:
+
     ```bash
     aws s3 mb s3://my-bucket \
       --endpoint-url http://localhost:5566 \
       --region us-east-1
     ```
 
-    To avoid repeating `--endpoint-url` on every command, add this to your `~/.aws/config`:
+    To avoid repeating `--endpoint-url` on every command, add a named profile to `~/.aws/config`:
 
     ```ini
     [profile kumolo]
@@ -130,17 +187,29 @@ kumolo accepts any non-empty key/secret pair.
     endpoint_url = http://localhost:5566
     ```
 
-    Then use `--profile kumolo` (or `AWS_PROFILE=kumolo`) instead.
+    Then use `--profile kumolo` or set `AWS_PROFILE=kumolo` in your shell:
+
+    ```bash
+    AWS_PROFILE=kumolo aws s3 ls
+    ```
   </TabItem>
 </Tabs>
 
-## Environment Variables
+## Environment variables
 
 | Variable           | Default  | Description                                        |
 |--------------------|----------|----------------------------------------------------|
 | `KUMOLO_PORT`      | `5566`   | HTTP listen port                                   |
-| `KUMOLO_DATA_DIR`  | *(none)* | Persistent storage directory. If unset, kumolo uses a temporary directory that is removed on exit. |
+| `KUMOLO_DATA_DIR`  | *(none)* | Persistent storage directory. If unset, a temporary directory is created and removed on exit. |
 | `KUMOLO_LOG_LEVEL` | `info`   | Log verbosity: `debug`, `info`, `warn`, `error`    |
 
-All environment variables can also be set as CLI flags with the same name in kebab-case
-(e.g. `--data-dir`, `--log-level`).
+All variables can also be set as CLI flags using kebab-case (e.g. `--data-dir`, `--log-level`).
+
+## Next steps
+
+<CardGrid>
+  <LinkCard title="S3 reference" href="/kumolo-docs/services/s3/" description="Browse all supported S3 operations." />
+  <LinkCard title="DynamoDB reference" href="/kumolo-docs/services/dynamodb/" description="Browse all supported DynamoDB operations." />
+  <LinkCard title="STS reference" href="/kumolo-docs/services/sts/" description="Browse all supported STS operations." />
+  <LinkCard title="Contributing" href="/kumolo-docs/contributing/" description="Help improve kumolo and its documentation." />
+</CardGrid>

@@ -3,4 +3,255 @@ title: Getting Started
 description: Install and configure kumolo for local development.
 ---
 
-Coming soon.
+import { Tabs, TabItem, LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+kumolo runs as a local HTTP server that accepts standard AWS SDK v2 requests.
+This guide gets you from zero to a working S3 or DynamoDB client in under five minutes.
+
+## Prerequisites
+
+| Method         | Requirement       |
+| -------------- | ----------------- |
+| Docker         | Docker 20.10+     |
+| Docker Compose | Docker Compose v2 |
+| Binary         | No dependencies   |
+
+## Installation
+
+<Tabs>
+  <TabItem label="Docker">
+    Run kumolo with a single command. Data lives in a temporary directory and is discarded when the container stops.
+
+    ```bash
+    docker run -p 5566:5566 ghcr.io/optiflowic/kumolo:latest
+    ```
+
+    To persist data across container restarts, mount a volume:
+
+    ```bash
+    docker run -p 5566:5566 \
+      -v $(pwd)/data:/data \
+      -e KUMOLO_DATA_DIR=/data \
+      ghcr.io/optiflowic/kumolo:latest
+    ```
+
+    :::tip
+    Omitting `KUMOLO_DATA_DIR` is fine for short-lived tests — kumolo creates a temp directory automatically and cleans it up on exit.
+    :::
+
+  </TabItem>
+  <TabItem label="Docker Compose">
+    Add kumolo as a service in your `compose.yaml`:
+
+    ```yaml
+    services:
+      kumolo:
+        image: ghcr.io/optiflowic/kumolo:latest
+        ports:
+          - "5566:5566"
+        # Uncomment to persist data:
+        # environment:
+        #   KUMOLO_DATA_DIR: /data
+        # volumes:
+        #   - ./data:/data
+    ```
+
+    Then start it:
+
+    ```bash
+    docker compose up kumolo
+    ```
+
+  </TabItem>
+  <TabItem label="Binary">
+    Download the latest binary for your platform from the
+    [GitHub Releases](https://github.com/optiflowic/kumolo/releases) page, then run:
+
+    ```bash
+    ./kumolo
+    ```
+
+    Options are also available as CLI flags:
+
+    ```bash
+    ./kumolo -port 5566 -data-dir ./data -log-level debug
+    ```
+
+  </TabItem>
+</Tabs>
+
+## Verify the server is running
+
+Once started, kumolo listens on port `5566`. Confirm it is up with:
+
+```bash
+curl -I http://localhost:5566/
+```
+
+You should receive a `404` response — that is expected. Any HTTP response confirms kumolo is accepting connections.
+
+## Connecting your AWS SDK
+
+Point your AWS SDK at `http://localhost:5566`. No real AWS credentials are required —
+kumolo accepts any non-empty key/secret pair.
+
+:::note
+Always set a region (e.g. `us-east-1`). kumolo does not validate the region value, but
+the AWS SDK requires one to be present.
+:::
+
+<Tabs>
+  <TabItem label="Go">
+    ```go
+    import (
+        "context"
+
+        "github.com/aws/aws-sdk-go-v2/aws"
+        "github.com/aws/aws-sdk-go-v2/config"
+        "github.com/aws/aws-sdk-go-v2/credentials"
+        "github.com/aws/aws-sdk-go-v2/service/dynamodb"
+        "github.com/aws/aws-sdk-go-v2/service/s3"
+    )
+
+    cfg, err := config.LoadDefaultConfig(context.Background(),
+        config.WithRegion("us-east-1"),
+        config.WithCredentialsProvider(
+            credentials.NewStaticCredentialsProvider("test", "test", ""),
+        ),
+    )
+    if err != nil {
+        panic(err)
+    }
+
+    // S3 requires UsePathStyle to avoid virtual-hosted-style URL resolution
+    s3Client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+        o.BaseEndpoint = aws.String("http://localhost:5566")
+        o.UsePathStyle = true
+    })
+
+    // DynamoDB and STS only need BaseEndpoint
+    ddbClient := dynamodb.NewFromConfig(cfg, func(o *dynamodb.Options) {
+        o.BaseEndpoint = aws.String("http://localhost:5566")
+    })
+    ```
+
+  </TabItem>
+  <TabItem label="Python (boto3)">
+    **S3**
+
+    ```python
+    import boto3
+
+    s3 = boto3.client(
+        "s3",
+        region_name="us-east-1",
+        endpoint_url="http://localhost:5566",
+        aws_access_key_id="test",
+        aws_secret_access_key="test",
+    )
+    ```
+
+    **DynamoDB**
+
+    ```python
+    dynamodb = boto3.client(
+        "dynamodb",
+        region_name="us-east-1",
+        endpoint_url="http://localhost:5566",
+        aws_access_key_id="test",
+        aws_secret_access_key="test",
+    )
+    ```
+
+  </TabItem>
+  <TabItem label="AWS CLI">
+    Pass `--endpoint-url` to any command:
+
+    ```bash
+    aws s3 mb s3://my-bucket \
+      --endpoint-url http://localhost:5566 \
+      --region us-east-1
+    ```
+
+    To avoid repeating `--endpoint-url` on every command, add a named profile to `~/.aws/config`:
+
+    ```ini
+    [profile kumolo]
+    region = us-east-1
+    endpoint_url = http://localhost:5566
+    ```
+
+    Then use `--profile kumolo` or set `AWS_PROFILE=kumolo` in your shell:
+
+    ```bash
+    AWS_PROFILE=kumolo aws s3 ls
+    ```
+
+  </TabItem>
+</Tabs>
+
+## Environment variables
+
+| Variable           | Default  | Description                                                                                   |
+| ------------------ | -------- | --------------------------------------------------------------------------------------------- |
+| `KUMOLO_PORT`      | `5566`   | HTTP listen port                                                                              |
+| `KUMOLO_DATA_DIR`  | _(none)_ | Persistent storage directory. If unset, a temporary directory is created and removed on exit. |
+| `KUMOLO_LOG_LEVEL` | `info`   | Log verbosity: `debug`, `info`, `warn`, `error`                                               |
+
+All variables can also be set as CLI flags using kebab-case (e.g. `--data-dir`, `--log-level`).
+
+## Troubleshooting
+
+**`Connection refused` when calling the SDK**
+
+kumolo is not running or is listening on a different port.
+Run the [health check above](#verify-the-server-is-running) — if you get no response,
+check that the container or process started successfully (`docker ps` or check process logs).
+
+---
+
+**S3: `InvalidBucketName` or requests hitting real AWS**
+
+You likely forgot `UsePathStyle = true` on the S3 client. Without it the SDK generates
+virtual-hosted-style URLs (e.g. `my-bucket.localhost`) that do not resolve to kumolo.
+
+---
+
+**S3: `NoSuchBucket` on the first request**
+
+Buckets are not created automatically. Call `CreateBucket` before any operation that requires an existing bucket.
+
+---
+
+**Debug request/response traffic**
+
+Set `KUMOLO_LOG_LEVEL=debug` to log every incoming request:
+
+```bash
+docker run -p 5566:5566 -e KUMOLO_LOG_LEVEL=debug ghcr.io/optiflowic/kumolo:latest
+```
+
+## Next steps
+
+<CardGrid>
+  <LinkCard
+    title="S3 reference"
+    href="/kumolo-docs/services/s3/"
+    description="Browse all supported S3 operations."
+  />
+  <LinkCard
+    title="DynamoDB reference"
+    href="/kumolo-docs/services/dynamodb/"
+    description="Browse all supported DynamoDB operations."
+  />
+  <LinkCard
+    title="STS reference"
+    href="/kumolo-docs/services/sts/"
+    description="Browse all supported STS operations."
+  />
+  <LinkCard
+    title="Contributing"
+    href="/kumolo-docs/contributing/"
+    description="Help improve kumolo and its documentation."
+  />
+</CardGrid>

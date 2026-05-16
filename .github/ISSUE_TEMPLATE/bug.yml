@@ -1,6 +1,6 @@
 name: 🐛 Bug Report
 description: Report an issue with the documentation site (broken links, incorrect content, rendering errors, etc.)
-title: "[Bug]: "
+title: '[Bug]: '
 labels: [bug]
 
 body:
@@ -14,7 +14,7 @@ body:
     attributes:
       label: Affected Page / URL
       description: Which page or section is affected?
-      placeholder: "e.g., /getting-started, /services/s3"
+      placeholder: 'e.g., /getting-started, /services/s3'
     validations:
       required: true
 
@@ -23,11 +23,11 @@ body:
     attributes:
       label: Issue Type
       options:
-        - "Incorrect content"
-        - "Broken link"
-        - "Rendering / layout error"
-        - "Missing content"
-        - "Other"
+        - 'Incorrect content'
+        - 'Broken link'
+        - 'Rendering / layout error'
+        - 'Missing content'
+        - 'Other'
     validations:
       required: true
 

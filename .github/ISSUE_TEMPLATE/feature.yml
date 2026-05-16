@@ -1,6 +1,6 @@
 name: 🌟 Feature Request
 description: Suggest new content, pages, or improvements to the documentation site
-title: "[Feature]: "
+title: '[Feature]: '
 labels: [enhancement]
 
 body:

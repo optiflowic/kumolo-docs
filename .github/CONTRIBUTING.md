@@ -33,10 +33,10 @@ Then open `http://localhost:4321` in your browser.
 
 ### Common Commands
 
-| Command | Description |
-|---|---|
-| `npm run dev` | Start local dev server |
-| `npm run build` | Build for production |
+| Command           | Description                      |
+| ----------------- | -------------------------------- |
+| `npm run dev`     | Start local dev server           |
+| `npm run build`   | Build for production             |
 | `npm run preview` | Preview production build locally |
 
 ## 📄 License

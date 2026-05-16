@@ -1,6 +1,6 @@
 name: 📚 Documentation Update
 description: Suggest improvements or corrections for a specific page
-title: "[Docs]: "
+title: '[Docs]: '
 labels: [documentation]
 
 body:

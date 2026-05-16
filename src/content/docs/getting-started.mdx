@@ -223,6 +223,19 @@ Buckets are not created automatically. Call `CreateBucket` before any operation 
 
 ---
 
+**DynamoDB: `ResourceNotFoundException` on the first request**
+
+Tables are not created automatically. Call `CreateTable` before any operation that requires an existing table.
+
+---
+
+**DynamoDB: requests hitting real AWS or `UnknownOperationException`**
+
+Verify that `BaseEndpoint` is set to `http://localhost:5566` in your DynamoDB client options.
+Unlike S3, DynamoDB does not need `UsePathStyle` — only `BaseEndpoint` is required.
+
+---
+
 **Debug request/response traffic**
 
 Set `KUMOLO_LOG_LEVEL=debug` to log every incoming request:

@@ -273,15 +273,19 @@ The website configuration API is accepted and persisted, but kumolo does not ser
         o.UsePathStyle = true  // required for local endpoint
     })
 
-    client.CreateBucket(context.Background(), &s3.CreateBucketInput{
+    if _, err = client.CreateBucket(context.Background(), &s3.CreateBucketInput{
         Bucket: aws.String("my-bucket"),
-    })
+    }); err != nil {
+        panic(err)
+    }
 
-    client.PutObject(context.Background(), &s3.PutObjectInput{
+    if _, err = client.PutObject(context.Background(), &s3.PutObjectInput{
         Bucket: aws.String("my-bucket"),
         Key:    aws.String("hello.txt"),
         Body:   strings.NewReader("hello, kumolo"),
-    })
+    }); err != nil {
+        panic(err)
+    }
     ```
 
   </TabItem>

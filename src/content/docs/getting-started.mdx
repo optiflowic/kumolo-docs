@@ -38,6 +38,16 @@ This guide gets you from zero to a working S3 or DynamoDB client in under five m
     :::tip
     Omitting `KUMOLO_DATA_DIR` is fine for short-lived tests — kumolo creates a temp directory automatically and cleans it up on exit.
     :::
+
+    :::caution[Pin the image version in CI]
+    Using `latest` in CI pipelines can cause non-reproducible builds. Pin to a specific release tag instead:
+
+    ```bash
+    docker run -p 5566:5566 ghcr.io/optiflowic/kumolo:v0.1.0
+    ```
+
+    Find available tags on the [GitHub Releases](https://github.com/optiflowic/kumolo/releases) page.
+    :::
   </TabItem>
   <TabItem label="Docker Compose">
     Add kumolo as a service in your `compose.yaml`:
@@ -60,6 +70,10 @@ This guide gets you from zero to a working S3 or DynamoDB client in under five m
     ```bash
     docker compose up kumolo
     ```
+
+    :::caution[Pin the image version in CI]
+    Replace `latest` with a specific release tag (e.g. `v0.1.0`) to ensure reproducible builds.
+    :::
   </TabItem>
   <TabItem label="Binary">
     Download the latest binary for your platform from the
@@ -204,6 +218,95 @@ the AWS SDK requires one to be present.
 | `KUMOLO_LOG_LEVEL` | `info`   | Log verbosity: `debug`, `info`, `warn`, `error`    |
 
 All variables can also be set as CLI flags using kebab-case (e.g. `--data-dir`, `--log-level`).
+
+## Using kumolo in CI
+
+kumolo works as a Docker service in any CI system that supports containers.
+
+<Tabs>
+  <TabItem label="GitHub Actions">
+    ```yaml
+    jobs:
+      test:
+        runs-on: ubuntu-latest
+        services:
+          kumolo:
+            image: ghcr.io/optiflowic/kumolo:v0.1.0
+            ports:
+              - 5566:5566
+        steps:
+          - uses: actions/checkout@v4
+          - name: Run tests
+            run: go test ./...
+            env:
+              AWS_ENDPOINT_URL: http://localhost:5566
+              AWS_REGION: us-east-1
+              AWS_ACCESS_KEY_ID: test
+              AWS_SECRET_ACCESS_KEY: test
+    ```
+
+    :::tip
+    Setting `AWS_ENDPOINT_URL` as an environment variable lets the AWS SDK pick it up automatically — no code changes needed.
+    :::
+  </TabItem>
+  <TabItem label="GitLab CI">
+    ```yaml
+    test:
+      image: golang:1.22
+      services:
+        - name: ghcr.io/optiflowic/kumolo:v0.1.0
+          alias: kumolo
+      variables:
+        AWS_ENDPOINT_URL: http://kumolo:5566
+        AWS_REGION: us-east-1
+        AWS_ACCESS_KEY_ID: test
+        AWS_SECRET_ACCESS_KEY: test
+      script:
+        - go test ./...
+    ```
+  </TabItem>
+</Tabs>
+
+## Troubleshooting
+
+**`Connection refused` when calling the SDK**
+
+kumolo is not running or is listening on a different port. Verify with:
+
+```bash
+curl -I http://localhost:5566/
+```
+
+If you get no response, check that the container or process started successfully (`docker ps` or check process logs).
+
+---
+
+**S3: `InvalidBucketName` or requests hitting real AWS**
+
+You likely forgot `UsePathStyle = true` on the S3 client. Without it the SDK generates
+virtual-hosted-style URLs (e.g. `my-bucket.localhost`) that do not resolve to kumolo.
+
+---
+
+**S3: `NoSuchBucket` on the first request**
+
+Buckets are not created automatically. Call `CreateBucket` before any operation that requires an existing bucket.
+
+---
+
+**Requests succeed locally but fail in CI**
+
+Check that `KUMOLO_DATA_DIR` is not set to a path that the container user cannot write to, and that the service has fully started before your test step runs. In GitHub Actions, the `services` block waits for the container to be healthy only if a `healthcheck` is configured; otherwise add a short `sleep` or a retry loop before the first request.
+
+---
+
+**Debug request/response traffic**
+
+Set `KUMOLO_LOG_LEVEL=debug` to log every incoming request:
+
+```bash
+docker run -p 5566:5566 -e KUMOLO_LOG_LEVEL=debug ghcr.io/optiflowic/kumolo:latest
+```
 
 ## Next steps
 

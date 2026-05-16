@@ -26,6 +26,7 @@ export default defineConfig({
         {
           label: 'Services',
           items: [
+            { label: 'Overview', slug: 'services' },
             { label: 'S3', slug: 'services/s3' },
             { label: 'DynamoDB', slug: 'services/dynamodb' },
             { label: 'STS', slug: 'services/sts' },

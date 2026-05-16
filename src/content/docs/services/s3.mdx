@@ -258,12 +258,15 @@ The website configuration API is accepted and persisted, but kumolo does not ser
         "github.com/aws/aws-sdk-go-v2/service/s3"
     )
 
-    cfg, _ := config.LoadDefaultConfig(context.Background(),
+    cfg, err := config.LoadDefaultConfig(context.Background(),
         config.WithRegion("us-east-1"),
         config.WithCredentialsProvider(
             credentials.NewStaticCredentialsProvider("test", "test", ""),
         ),
     )
+    if err != nil {
+        panic(err)
+    }
 
     client := s3.NewFromConfig(cfg, func(o *s3.Options) {
         o.BaseEndpoint = aws.String("http://localhost:5566")

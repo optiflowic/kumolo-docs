@@ -6,6 +6,7 @@ description: Supported DynamoDB operations in kumolo.
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 kumolo implements the DynamoDB REST API. All operations accept standard AWS SDK v2 requests — point your client at `http://localhost:5566`.
+Unlike S3, `UsePathStyle` is not required; only `BaseEndpoint` needs to be overridden on the client.
 
 ## Support levels
 
@@ -152,10 +153,6 @@ Kinesis destination configuration is persisted and returned. No data is forwarde
 | `DescribeContributorInsights` |     —     |
 | `ListContributorInsights`     |     —     |
 | `UpdateContributorInsights`   |     —     |
-
-:::note
-Unlike S3, DynamoDB does not require `UsePathStyle`. Only `BaseEndpoint` needs to be overridden on the client.
-:::
 
 ## Quick start
 

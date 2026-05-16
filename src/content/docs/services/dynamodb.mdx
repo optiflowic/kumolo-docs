@@ -42,12 +42,23 @@ Operations sourced from [`internal/dynamodb/router.go`](https://github.com/optif
 | `DeleteItem` |     ✓     |
 | `UpdateItem` |     ✓     |
 
+:::note
+`PutItem`, `DeleteItem`, and `UpdateItem` support `ConditionExpression` for conditional writes.
+`UpdateItem` supports `UpdateExpression` for atomic attribute updates (`SET`, `REMOVE`, `ADD`, `DELETE`).
+:::
+
 ### Query & scan
 
 | Operation | Supported |
 | --------- | :-------: |
 | `Query`   |     ✓     |
 | `Scan`    |     ✓     |
+
+:::note
+`Query` supports `KeyConditionExpression`, `FilterExpression`, and `ProjectionExpression`.
+`Scan` supports `FilterExpression` and `ProjectionExpression`.
+Both operations support `ExpressionAttributeNames` and `ExpressionAttributeValues`.
+:::
 
 ### Batch & transactions
 
@@ -141,6 +152,10 @@ Kinesis destination configuration is persisted and returned. No data is forwarde
 | `DescribeContributorInsights` |     —     |
 | `ListContributorInsights`     |     —     |
 | `UpdateContributorInsights`   |     —     |
+
+:::note
+Unlike S3, DynamoDB does not require `UsePathStyle`. Only `BaseEndpoint` needs to be overridden on the client.
+:::
 
 ## Quick start
 

@@ -10,11 +10,11 @@ This guide gets you from zero to a working S3 or DynamoDB client in under five m
 
 ## Prerequisites
 
-| Method         | Requirement             |
-|----------------|-------------------------|
-| Docker         | Docker 20.10+           |
-| Docker Compose | Docker Compose v2       |
-| Binary         | No dependencies         |
+| Method         | Requirement       |
+| -------------- | ----------------- |
+| Docker         | Docker 20.10+     |
+| Docker Compose | Docker Compose v2 |
+| Binary         | No dependencies   |
 
 ## Installation
 
@@ -76,6 +76,7 @@ This guide gets you from zero to a working S3 or DynamoDB client in under five m
     ```bash
     ./kumolo -port 5566 -data-dir ./data -log-level debug
     ```
+
   </TabItem>
 </Tabs>
 
@@ -144,6 +145,7 @@ the AWS SDK requires one to be present.
     :::tip
     `UsePathStyle` is only required for S3. DynamoDB and STS clients work with `BaseEndpoint` alone.
     :::
+
   </TabItem>
   <TabItem label="Python (boto3)">
     **S3**
@@ -171,6 +173,7 @@ the AWS SDK requires one to be present.
         aws_secret_access_key="test",
     )
     ```
+
   </TabItem>
   <TabItem label="AWS CLI">
     Pass `--endpoint-url` to any command:
@@ -194,16 +197,17 @@ the AWS SDK requires one to be present.
     ```bash
     AWS_PROFILE=kumolo aws s3 ls
     ```
+
   </TabItem>
 </Tabs>
 
 ## Environment variables
 
-| Variable           | Default  | Description                                        |
-|--------------------|----------|----------------------------------------------------|
-| `KUMOLO_PORT`      | `5566`   | HTTP listen port                                   |
-| `KUMOLO_DATA_DIR`  | *(none)* | Persistent storage directory. If unset, a temporary directory is created and removed on exit. |
-| `KUMOLO_LOG_LEVEL` | `info`   | Log verbosity: `debug`, `info`, `warn`, `error`    |
+| Variable           | Default  | Description                                                                                   |
+| ------------------ | -------- | --------------------------------------------------------------------------------------------- |
+| `KUMOLO_PORT`      | `5566`   | HTTP listen port                                                                              |
+| `KUMOLO_DATA_DIR`  | _(none)_ | Persistent storage directory. If unset, a temporary directory is created and removed on exit. |
+| `KUMOLO_LOG_LEVEL` | `info`   | Log verbosity: `debug`, `info`, `warn`, `error`                                               |
 
 All variables can also be set as CLI flags using kebab-case (e.g. `--data-dir`, `--log-level`).
 
@@ -245,8 +249,24 @@ docker run -p 5566:5566 -e KUMOLO_LOG_LEVEL=debug ghcr.io/optiflowic/kumolo:late
 ## Next steps
 
 <CardGrid>
-  <LinkCard title="S3 reference" href="/kumolo-docs/services/s3/" description="Browse all supported S3 operations." />
-  <LinkCard title="DynamoDB reference" href="/kumolo-docs/services/dynamodb/" description="Browse all supported DynamoDB operations." />
-  <LinkCard title="STS reference" href="/kumolo-docs/services/sts/" description="Browse all supported STS operations." />
-  <LinkCard title="Contributing" href="/kumolo-docs/contributing/" description="Help improve kumolo and its documentation." />
+  <LinkCard
+    title="S3 reference"
+    href="/kumolo-docs/services/s3/"
+    description="Browse all supported S3 operations."
+  />
+  <LinkCard
+    title="DynamoDB reference"
+    href="/kumolo-docs/services/dynamodb/"
+    description="Browse all supported DynamoDB operations."
+  />
+  <LinkCard
+    title="STS reference"
+    href="/kumolo-docs/services/sts/"
+    description="Browse all supported STS operations."
+  />
+  <LinkCard
+    title="Contributing"
+    href="/kumolo-docs/contributing/"
+    description="Help improve kumolo and its documentation."
+  />
 </CardGrid>

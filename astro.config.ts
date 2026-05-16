@@ -10,6 +10,7 @@ export default defineConfig({
     starlight({
       title: 'kumolo',
       favicon: '/favicon.png',
+      customCss: ['./src/styles/custom.css'],
       logo: {
         src: './src/assets/logo.png',
         alt: 'kumolo',
@@ -25,6 +26,7 @@ export default defineConfig({
         { label: 'Getting Started', slug: 'getting-started' },
         {
           label: 'Services',
+          collapsed: false,
           items: [
             { label: 'Overview', slug: 'services' },
             { label: 'S3', slug: 'services/s3' },

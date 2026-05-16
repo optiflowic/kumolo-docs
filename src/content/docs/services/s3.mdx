@@ -3,4 +3,316 @@ title: S3
 description: Supported S3 operations in kumolo.
 ---
 
-Coming soon.
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+kumolo implements the S3 REST API. All operations accept standard AWS SDK v2 requests — point your client at `http://localhost:5566` with `UsePathStyle = true`.
+
+## Support levels
+
+| Symbol | Meaning |
+| :----: | ------- |
+| ✓ | Fully implemented — the feature behaves like real AWS |
+| ◐ | Config stored — the API call succeeds and the configuration is persisted and returned, but the underlying feature does not run (e.g. no event delivery, no log forwarding) |
+| — | Not yet implemented |
+
+## Operation support
+
+Operations sourced from [`internal/s3/router.go`](https://github.com/optiflowic/kumolo/blob/main/internal/s3/router.go) in the kumolo repository.
+
+### Bucket operations
+
+| Operation | Supported |
+| --------- | :-------: |
+| `CreateBucket` | ✓ |
+| `DeleteBucket` | ✓ |
+| `HeadBucket` | ✓ |
+| `ListBuckets` | ✓ |
+| `ListDirectoryBuckets` | — |
+| `CreateSession` | — |
+
+### Object operations
+
+| Operation | Supported |
+| --------- | :-------: |
+| `PutObject` | ✓ |
+| `GetObject` | ✓ |
+| `DeleteObject` | ✓ |
+| `DeleteObjects` | ✓ |
+| `HeadObject` | ✓ |
+| `CopyObject` | ✓ |
+| `GetObjectAttributes` | ✓ |
+| `RestoreObject` | ✓ |
+| `SelectObjectContent` | — |
+| `GetObjectTorrent` | — |
+| `WriteGetObjectResponse` | — |
+
+### Listing
+
+| Operation | Supported |
+| --------- | :-------: |
+| `ListObjects` | ✓ |
+| `ListObjectsV2` | ✓ |
+| `ListObjectVersions` | ✓ |
+
+### Multipart upload
+
+| Operation | Supported |
+| --------- | :-------: |
+| `CreateMultipartUpload` | ✓ |
+| `UploadPart` | ✓ |
+| `UploadPartCopy` | ✓ |
+| `CompleteMultipartUpload` | ✓ |
+| `AbortMultipartUpload` | ✓ |
+| `ListMultipartUploads` | ✓ |
+| `ListParts` | ✓ |
+
+### Versioning
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetBucketVersioning` | ✓ |
+| `PutBucketVersioning` | ✓ |
+
+### CORS
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetBucketCors` | ✓ |
+| `PutBucketCors` | ✓ |
+| `DeleteBucketCors` | ✓ |
+
+### Tagging
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetBucketTagging` | ✓ |
+| `PutBucketTagging` | ✓ |
+| `DeleteBucketTagging` | ✓ |
+| `GetObjectTagging` | ✓ |
+| `PutObjectTagging` | ✓ |
+| `DeleteObjectTagging` | ✓ |
+
+### Object Lock
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetObjectRetention` | ✓ |
+| `PutObjectRetention` | ✓ |
+| `GetObjectLegalHold` | ✓ |
+| `PutObjectLegalHold` | ✓ |
+| `GetObjectLockConfiguration` | ◐ |
+| `PutObjectLockConfiguration` | ◐ |
+
+### Location
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetBucketLocation` | ✓ |
+
+### Policy
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetBucketPolicy` | ◐ |
+| `PutBucketPolicy` | ◐ |
+| `DeleteBucketPolicy` | ◐ |
+| `GetBucketPolicyStatus` | — |
+
+### ACL
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetBucketAcl` | ◐ |
+| `PutBucketAcl` | ◐ |
+| `GetObjectAcl` | ◐ |
+| `PutObjectAcl` | ◐ |
+
+### Encryption
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetBucketEncryption` | ◐ |
+| `PutBucketEncryption` | ◐ |
+| `DeleteBucketEncryption` | ◐ |
+
+### Public access block
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetPublicAccessBlock` | ◐ |
+| `PutPublicAccessBlock` | ◐ |
+| `DeletePublicAccessBlock` | ◐ |
+
+### Ownership controls
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetBucketOwnershipControls` | ◐ |
+| `PutBucketOwnershipControls` | ◐ |
+| `DeleteBucketOwnershipControls` | ◐ |
+
+### Lifecycle
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetBucketLifecycleConfiguration` | ◐ |
+| `PutBucketLifecycleConfiguration` | ◐ |
+| `DeleteBucketLifecycle` | ◐ |
+
+### Static website hosting
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetBucketWebsite` | ◐ |
+| `PutBucketWebsite` | ◐ |
+| `DeleteBucketWebsite` | ◐ |
+
+:::note
+The website configuration API is accepted and persisted, but kumolo does not serve static website content. The website endpoint is not available.
+:::
+
+### Replication
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetBucketReplication` | ◐ |
+| `PutBucketReplication` | ◐ |
+| `DeleteBucketReplication` | ◐ |
+
+### Notification
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetBucketNotificationConfiguration` | ◐ |
+| `PutBucketNotificationConfiguration` | ◐ |
+
+### Logging
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetBucketLogging` | ◐ |
+| `PutBucketLogging` | ◐ |
+
+### Transfer acceleration
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetBucketAccelerateConfiguration` | ◐ |
+| `PutBucketAccelerateConfiguration` | ◐ |
+
+### Request payment
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetBucketRequestPayment` | ◐ |
+| `PutBucketRequestPayment` | ◐ |
+
+### Analytics
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetBucketAnalyticsConfiguration` | — |
+| `PutBucketAnalyticsConfiguration` | — |
+| `DeleteBucketAnalyticsConfiguration` | — |
+| `ListBucketAnalyticsConfigurations` | — |
+
+### Intelligent-Tiering
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetBucketIntelligentTieringConfiguration` | — |
+| `PutBucketIntelligentTieringConfiguration` | — |
+| `DeleteBucketIntelligentTieringConfiguration` | — |
+| `ListBucketIntelligentTieringConfigurations` | — |
+
+### Inventory
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetBucketInventoryConfiguration` | — |
+| `PutBucketInventoryConfiguration` | — |
+| `DeleteBucketInventoryConfiguration` | — |
+| `ListBucketInventoryConfigurations` | — |
+
+### Metrics
+
+| Operation | Supported |
+| --------- | :-------: |
+| `GetBucketMetricsConfiguration` | — |
+| `PutBucketMetricsConfiguration` | — |
+| `DeleteBucketMetricsConfiguration` | — |
+| `ListBucketMetricsConfigurations` | — |
+
+## Quick start
+
+<Tabs>
+  <TabItem label="Go">
+    ```go
+    import (
+        "context"
+        "strings"
+
+        "github.com/aws/aws-sdk-go-v2/aws"
+        "github.com/aws/aws-sdk-go-v2/config"
+        "github.com/aws/aws-sdk-go-v2/credentials"
+        "github.com/aws/aws-sdk-go-v2/service/s3"
+    )
+
+    cfg, _ := config.LoadDefaultConfig(context.Background(),
+        config.WithRegion("us-east-1"),
+        config.WithCredentialsProvider(
+            credentials.NewStaticCredentialsProvider("test", "test", ""),
+        ),
+    )
+
+    client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+        o.BaseEndpoint = aws.String("http://localhost:5566")
+        o.UsePathStyle = true  // required for local endpoint
+    })
+
+    client.CreateBucket(context.Background(), &s3.CreateBucketInput{
+        Bucket: aws.String("my-bucket"),
+    })
+
+    client.PutObject(context.Background(), &s3.PutObjectInput{
+        Bucket: aws.String("my-bucket"),
+        Key:    aws.String("hello.txt"),
+        Body:   strings.NewReader("hello, kumolo"),
+    })
+    ```
+
+  </TabItem>
+  <TabItem label="Python (boto3)">
+    ```python
+    import boto3
+
+    s3 = boto3.client(
+        "s3",
+        region_name="us-east-1",
+        endpoint_url="http://localhost:5566",
+        aws_access_key_id="test",
+        aws_secret_access_key="test",
+    )
+
+    s3.create_bucket(Bucket="my-bucket")
+    s3.put_object(Bucket="my-bucket", Key="hello.txt", Body=b"hello, kumolo")
+    ```
+
+  </TabItem>
+  <TabItem label="AWS CLI">
+    ```bash
+    aws s3 mb s3://my-bucket \
+      --endpoint-url http://localhost:5566 \
+      --region us-east-1
+
+    aws s3 cp hello.txt s3://my-bucket/ \
+      --endpoint-url http://localhost:5566
+    ```
+
+  </TabItem>
+</Tabs>
+
+:::note
+`UsePathStyle = true` is required for Go and other SDKs that default to virtual-hosted-style URLs.
+Without it, the SDK generates URLs like `my-bucket.localhost:5566` which do not resolve.
+:::

@@ -3,29 +3,26 @@ title: Services
 description: Overview of AWS services supported by kumolo.
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 
 kumolo supports the following AWS services. Each service page lists the supported operations and usage examples.
 
 <CardGrid>
-  <Card title="S3">
-    Object storage — buckets, objects, multipart uploads, and more.
-
-    [View S3 docs →](./s3/)
-
-  </Card>
-  <Card title="DynamoDB">
-    NoSQL database — tables, items, queries, and scans.
-
-    [View DynamoDB docs →](./dynamodb/)
-
-  </Card>
-  <Card title="STS">
-    Security Token Service — temporary credentials for local testing.
-
-    [View STS docs →](./sts/)
-
-  </Card>
+  <LinkCard
+    title="S3"
+    href="./s3/"
+    description="Object storage — buckets, objects, multipart uploads, and more."
+  />
+  <LinkCard
+    title="DynamoDB"
+    href="./dynamodb/"
+    description="NoSQL database — tables, items, queries, and scans."
+  />
+  <LinkCard
+    title="STS"
+    href="./sts/"
+    description="Security Token Service — temporary credentials for local testing."
+  />
 </CardGrid>
 
 ## Coming soon

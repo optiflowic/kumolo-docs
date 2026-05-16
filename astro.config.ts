@@ -34,7 +34,6 @@ export default defineConfig({
             { label: 'STS', slug: 'services/sts' },
           ],
         },
-        { label: 'Contributing', slug: 'contributing' },
       ],
     }),
   ],

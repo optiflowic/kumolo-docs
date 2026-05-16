@@ -102,8 +102,6 @@ the AWS SDK requires one to be present.
 
 <Tabs>
   <TabItem label="Go">
-    **S3**
-
     ```go
     import (
         "context"
@@ -111,6 +109,7 @@ the AWS SDK requires one to be present.
         "github.com/aws/aws-sdk-go-v2/aws"
         "github.com/aws/aws-sdk-go-v2/config"
         "github.com/aws/aws-sdk-go-v2/credentials"
+        "github.com/aws/aws-sdk-go-v2/service/dynamodb"
         "github.com/aws/aws-sdk-go-v2/service/s3"
     )
 
@@ -124,27 +123,17 @@ the AWS SDK requires one to be present.
         panic(err)
     }
 
+    // S3 requires UsePathStyle to avoid virtual-hosted-style URL resolution
     s3Client := s3.NewFromConfig(cfg, func(o *s3.Options) {
         o.BaseEndpoint = aws.String("http://localhost:5566")
         o.UsePathStyle = true
     })
-    ```
 
-    **DynamoDB**
-
-    ```go
-    import (
-        "github.com/aws/aws-sdk-go-v2/service/dynamodb"
-    )
-
+    // DynamoDB and STS only need BaseEndpoint
     ddbClient := dynamodb.NewFromConfig(cfg, func(o *dynamodb.Options) {
         o.BaseEndpoint = aws.String("http://localhost:5566")
     })
     ```
-
-    :::tip
-    `UsePathStyle` is only required for S3. DynamoDB and STS clients work with `BaseEndpoint` alone.
-    :::
 
   </TabItem>
   <TabItem label="Python (boto3)">
@@ -215,13 +204,9 @@ All variables can also be set as CLI flags using kebab-case (e.g. `--data-dir`, 
 
 **`Connection refused` when calling the SDK**
 
-kumolo is not running or is listening on a different port. Verify with:
-
-```bash
-curl -I http://localhost:5566/
-```
-
-If you get no response, check that the container or process started successfully (`docker ps` or check process logs).
+kumolo is not running or is listening on a different port.
+Run the [health check above](#verify-the-server-is-running) — if you get no response,
+check that the container or process started successfully (`docker ps` or check process logs).
 
 ---
 

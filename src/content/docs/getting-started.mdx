@@ -3,4 +3,144 @@ title: Getting Started
 description: Install and configure kumolo for local development.
 ---
 
-Coming soon.
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+kumolo runs as a local HTTP server that accepts standard AWS SDK v2 requests.
+This guide gets you from zero to a working S3 or DynamoDB client in under five minutes.
+
+## Installation
+
+<Tabs>
+  <TabItem label="Docker">
+    Run kumolo in a single command. Data is stored in memory and discarded when the container stops.
+
+    ```bash
+    docker run -p 5566:5566 ghcr.io/optiflowic/kumolo:latest
+    ```
+
+    To persist data across restarts, mount a volume:
+
+    ```bash
+    docker run -p 5566:5566 \
+      -v $(pwd)/data:/data \
+      -e KUMOLO_DATA_DIR=/data \
+      ghcr.io/optiflowic/kumolo:latest
+    ```
+  </TabItem>
+  <TabItem label="Docker Compose">
+    Add kumolo as a service in your `compose.yaml`:
+
+    ```yaml
+    services:
+      kumolo:
+        image: ghcr.io/optiflowic/kumolo:latest
+        ports:
+          - "5566:5566"
+        # Uncomment to persist data:
+        # environment:
+        #   KUMOLO_DATA_DIR: /data
+        # volumes:
+        #   - ./data:/data
+    ```
+
+    Then start it:
+
+    ```bash
+    docker compose up kumolo
+    ```
+  </TabItem>
+  <TabItem label="Binary">
+    Download the latest binary for your platform from the
+    [GitHub Releases](https://github.com/optiflowic/kumolo/releases) page and run:
+
+    ```bash
+    ./kumolo
+    ```
+
+    You can also set options via flags:
+
+    ```bash
+    ./kumolo -port 5566 -data-dir ./data -log-level debug
+    ```
+  </TabItem>
+</Tabs>
+
+Once started, kumolo listens on `http://localhost:5566`.
+
+## Connecting your AWS SDK
+
+Point your AWS SDK at `http://localhost:5566`. No real AWS credentials are required —
+kumolo accepts any non-empty key/secret pair.
+
+<Tabs>
+  <TabItem label="Go">
+    ```go
+    import (
+        "context"
+
+        "github.com/aws/aws-sdk-go-v2/aws"
+        "github.com/aws/aws-sdk-go-v2/config"
+        "github.com/aws/aws-sdk-go-v2/credentials"
+        "github.com/aws/aws-sdk-go-v2/service/s3"
+    )
+
+    cfg, err := config.LoadDefaultConfig(context.Background(),
+        config.WithRegion("us-east-1"),
+        config.WithCredentialsProvider(
+            credentials.NewStaticCredentialsProvider("test", "test", ""),
+        ),
+    )
+    if err != nil {
+        panic(err)
+    }
+
+    client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+        o.BaseEndpoint = aws.String("http://localhost:5566")
+        o.UsePathStyle = true
+    })
+    ```
+
+    The same `BaseEndpoint` / `UsePathStyle` pattern applies to DynamoDB, STS, and all other supported services.
+  </TabItem>
+  <TabItem label="Python (boto3)">
+    ```python
+    import boto3
+
+    s3 = boto3.client(
+        "s3",
+        region_name="us-east-1",
+        endpoint_url="http://localhost:5566",
+        aws_access_key_id="test",
+        aws_secret_access_key="test",
+    )
+    ```
+  </TabItem>
+  <TabItem label="AWS CLI">
+    ```bash
+    aws s3 mb s3://my-bucket \
+      --endpoint-url http://localhost:5566 \
+      --region us-east-1
+    ```
+
+    To avoid repeating `--endpoint-url` on every command, add this to your `~/.aws/config`:
+
+    ```ini
+    [profile kumolo]
+    region = us-east-1
+    endpoint_url = http://localhost:5566
+    ```
+
+    Then use `--profile kumolo` (or `AWS_PROFILE=kumolo`) instead.
+  </TabItem>
+</Tabs>
+
+## Environment Variables
+
+| Variable           | Default  | Description                                        |
+|--------------------|----------|----------------------------------------------------|
+| `KUMOLO_PORT`      | `5566`   | HTTP listen port                                   |
+| `KUMOLO_DATA_DIR`  | *(none)* | Persistent storage directory. If unset, kumolo uses a temporary directory that is removed on exit. |
+| `KUMOLO_LOG_LEVEL` | `info`   | Log verbosity: `debug`, `info`, `warn`, `error`    |
+
+All environment variables can also be set as CLI flags with the same name in kebab-case
+(e.g. `--data-dir`, `--log-level`).

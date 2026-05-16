@@ -4,6 +4,9 @@ description: High-fidelity AWS emulator for local development and testing.
 template: splash
 hero:
   tagline: A high-fidelity AWS emulator for local development and testing.
+  image:
+    file: ../../assets/hero.png
+    alt: kumolo mascot — a friendly cloud character holding a laptop
   actions:
     - text: Get Started
       link: ./getting-started/
@@ -13,3 +16,82 @@ hero:
       icon: external
       variant: minimal
 ---
+
+import { Card, CardGrid, Tabs, TabItem } from '@astrojs/starlight/components';
+
+## What is kumolo?
+
+kumolo runs as a standalone server that accepts standard AWS SDK v2 requests.
+No mocking, no stubs — it behaves like real AWS.
+
+> **If it works on kumolo, it works on real AWS — and vice versa.**
+
+<CardGrid>
+  <Card title="Drop-in compatible" icon="approve-check">
+    Point your existing AWS SDK at `http://localhost:5566`. No code changes needed.
+  </Card>
+  <Card title="High fidelity" icon="star">
+    Behaves like real AWS — error codes, response shapes, and edge cases included.
+  </Card>
+  <Card title="Fast iteration" icon="rocket">
+    No network latency, no AWS bills, no IAM headaches during local development.
+  </Card>
+  <Card title="Supported services" icon="list-format">
+    S3, DynamoDB, STS — with more services on the roadmap.
+  </Card>
+</CardGrid>
+
+## Already using AWS SDK v2?
+
+Just point your client at kumolo — no other code changes needed.
+
+<Tabs>
+  <TabItem label="Go">
+    ```go
+    client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+        o.BaseEndpoint = aws.String("http://localhost:5566")
+        o.UsePathStyle = true
+    })
+    ```
+  </TabItem>
+  <TabItem label="Python">
+    ```python
+    import boto3
+
+    s3 = boto3.client(
+        "s3",
+        endpoint_url="http://localhost:5566",
+        aws_access_key_id="test",
+        aws_secret_access_key="test",
+        region_name="us-east-1",
+    )
+    ```
+  </TabItem>
+  <TabItem label="TypeScript">
+    ```typescript
+    import { S3Client } from "@aws-sdk/client-s3";
+
+    const client = new S3Client({
+        endpoint: "http://localhost:5566",
+        forcePathStyle: true,
+        region: "us-east-1",
+        credentials: {
+            accessKeyId: "test",
+            secretAccessKey: "test",
+        },
+    });
+    ```
+  </TabItem>
+</Tabs>
+
+The same pattern applies to DynamoDB, STS, and all other supported services.
+
+## Quick Start
+
+```bash
+docker run -p 5566:5566 ghcr.io/optiflowic/kumolo:latest
+```
+
+Point your AWS SDK at `http://localhost:5566` — no other changes needed.
+
+[Full installation guide →](./getting-started/)

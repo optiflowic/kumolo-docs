@@ -88,6 +88,12 @@ The returned credentials do not expire and are accepted by kumolo regardless of 
         panic(err)
     }
     fmt.Println("AccessKeyId:", *role.Credentials.AccessKeyId)
+
+    token, err := client.GetSessionToken(context.Background(), &sts.GetSessionTokenInput{})
+    if err != nil {
+        panic(err)
+    }
+    fmt.Println("SessionToken:", *token.Credentials.SessionToken)
     ```
 
   </TabItem>
@@ -112,6 +118,9 @@ The returned credentials do not expire and are accepted by kumolo regardless of 
         RoleSessionName="my-session",
     )
     print("AccessKeyId:", role["Credentials"]["AccessKeyId"])
+
+    token = sts.get_session_token()
+    print("SessionToken:", token["Credentials"]["SessionToken"])
     ```
 
   </TabItem>
@@ -124,6 +133,10 @@ The returned credentials do not expire and are accepted by kumolo regardless of 
     aws sts assume-role \
       --role-arn arn:aws:iam::000000000000:role/my-role \
       --role-session-name my-session \
+      --endpoint-url http://localhost:5566 \
+      --region us-east-1
+
+    aws sts get-session-token \
       --endpoint-url http://localhost:5566 \
       --region us-east-1
     ```

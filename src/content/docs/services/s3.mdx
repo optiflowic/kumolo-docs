@@ -9,11 +9,11 @@ kumolo implements the S3 REST API. All operations accept standard AWS SDK v2 req
 
 ## Support levels
 
-| Symbol | Meaning |
-| :----: | ------- |
-| ✓ | Fully implemented — the feature behaves like real AWS |
-| ◐ | Config stored — the API call succeeds and the configuration is persisted and returned, but the underlying feature does not run (e.g. no event delivery, no log forwarding) |
-| — | Not yet implemented |
+| Symbol | Meaning                                                                                                                                                                    |
+| :----: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|   ✓    | Fully implemented — the feature behaves like real AWS                                                                                                                      |
+|   ◐    | Config stored — the API call succeeds and the configuration is persisted and returned, but the underlying feature does not run (e.g. no event delivery, no log forwarding) |
+|   —    | Not yet implemented                                                                                                                                                        |
 
 ## Operation support
 
@@ -21,151 +21,151 @@ Operations sourced from [`internal/s3/router.go`](https://github.com/optiflowic/
 
 ### Bucket operations
 
-| Operation | Supported |
-| --------- | :-------: |
-| `CreateBucket` | ✓ |
-| `DeleteBucket` | ✓ |
-| `HeadBucket` | ✓ |
-| `ListBuckets` | ✓ |
-| `ListDirectoryBuckets` | — |
-| `CreateSession` | — |
+| Operation              | Supported |
+| ---------------------- | :-------: |
+| `CreateBucket`         |     ✓     |
+| `DeleteBucket`         |     ✓     |
+| `HeadBucket`           |     ✓     |
+| `ListBuckets`          |     ✓     |
+| `ListDirectoryBuckets` |     —     |
+| `CreateSession`        |     —     |
 
 ### Object operations
 
-| Operation | Supported |
-| --------- | :-------: |
-| `PutObject` | ✓ |
-| `GetObject` | ✓ |
-| `DeleteObject` | ✓ |
-| `DeleteObjects` | ✓ |
-| `HeadObject` | ✓ |
-| `CopyObject` | ✓ |
-| `GetObjectAttributes` | ✓ |
-| `RestoreObject` | ✓ |
-| `SelectObjectContent` | — |
-| `GetObjectTorrent` | — |
-| `WriteGetObjectResponse` | — |
+| Operation                | Supported |
+| ------------------------ | :-------: |
+| `PutObject`              |     ✓     |
+| `GetObject`              |     ✓     |
+| `DeleteObject`           |     ✓     |
+| `DeleteObjects`          |     ✓     |
+| `HeadObject`             |     ✓     |
+| `CopyObject`             |     ✓     |
+| `GetObjectAttributes`    |     ✓     |
+| `RestoreObject`          |     ✓     |
+| `SelectObjectContent`    |     —     |
+| `GetObjectTorrent`       |     —     |
+| `WriteGetObjectResponse` |     —     |
 
 ### Listing
 
-| Operation | Supported |
-| --------- | :-------: |
-| `ListObjects` | ✓ |
-| `ListObjectsV2` | ✓ |
-| `ListObjectVersions` | ✓ |
+| Operation            | Supported |
+| -------------------- | :-------: |
+| `ListObjects`        |     ✓     |
+| `ListObjectsV2`      |     ✓     |
+| `ListObjectVersions` |     ✓     |
 
 ### Multipart upload
 
-| Operation | Supported |
-| --------- | :-------: |
-| `CreateMultipartUpload` | ✓ |
-| `UploadPart` | ✓ |
-| `UploadPartCopy` | ✓ |
-| `CompleteMultipartUpload` | ✓ |
-| `AbortMultipartUpload` | ✓ |
-| `ListMultipartUploads` | ✓ |
-| `ListParts` | ✓ |
+| Operation                 | Supported |
+| ------------------------- | :-------: |
+| `CreateMultipartUpload`   |     ✓     |
+| `UploadPart`              |     ✓     |
+| `UploadPartCopy`          |     ✓     |
+| `CompleteMultipartUpload` |     ✓     |
+| `AbortMultipartUpload`    |     ✓     |
+| `ListMultipartUploads`    |     ✓     |
+| `ListParts`               |     ✓     |
 
 ### Versioning
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetBucketVersioning` | ✓ |
-| `PutBucketVersioning` | ✓ |
+| Operation             | Supported |
+| --------------------- | :-------: |
+| `GetBucketVersioning` |     ✓     |
+| `PutBucketVersioning` |     ✓     |
 
 ### CORS
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetBucketCors` | ✓ |
-| `PutBucketCors` | ✓ |
-| `DeleteBucketCors` | ✓ |
+| Operation          | Supported |
+| ------------------ | :-------: |
+| `GetBucketCors`    |     ✓     |
+| `PutBucketCors`    |     ✓     |
+| `DeleteBucketCors` |     ✓     |
 
 ### Tagging
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetBucketTagging` | ✓ |
-| `PutBucketTagging` | ✓ |
-| `DeleteBucketTagging` | ✓ |
-| `GetObjectTagging` | ✓ |
-| `PutObjectTagging` | ✓ |
-| `DeleteObjectTagging` | ✓ |
+| Operation             | Supported |
+| --------------------- | :-------: |
+| `GetBucketTagging`    |     ✓     |
+| `PutBucketTagging`    |     ✓     |
+| `DeleteBucketTagging` |     ✓     |
+| `GetObjectTagging`    |     ✓     |
+| `PutObjectTagging`    |     ✓     |
+| `DeleteObjectTagging` |     ✓     |
 
 ### Object Lock
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetObjectRetention` | ✓ |
-| `PutObjectRetention` | ✓ |
-| `GetObjectLegalHold` | ✓ |
-| `PutObjectLegalHold` | ✓ |
-| `GetObjectLockConfiguration` | ◐ |
-| `PutObjectLockConfiguration` | ◐ |
+| Operation                    | Supported |
+| ---------------------------- | :-------: |
+| `GetObjectRetention`         |     ✓     |
+| `PutObjectRetention`         |     ✓     |
+| `GetObjectLegalHold`         |     ✓     |
+| `PutObjectLegalHold`         |     ✓     |
+| `GetObjectLockConfiguration` |     ◐     |
+| `PutObjectLockConfiguration` |     ◐     |
 
 ### Location
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetBucketLocation` | ✓ |
+| Operation           | Supported |
+| ------------------- | :-------: |
+| `GetBucketLocation` |     ✓     |
 
 ### Policy
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetBucketPolicy` | ◐ |
-| `PutBucketPolicy` | ◐ |
-| `DeleteBucketPolicy` | ◐ |
-| `GetBucketPolicyStatus` | — |
+| Operation               | Supported |
+| ----------------------- | :-------: |
+| `GetBucketPolicy`       |     ◐     |
+| `PutBucketPolicy`       |     ◐     |
+| `DeleteBucketPolicy`    |     ◐     |
+| `GetBucketPolicyStatus` |     —     |
 
 ### ACL
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetBucketAcl` | ◐ |
-| `PutBucketAcl` | ◐ |
-| `GetObjectAcl` | ◐ |
-| `PutObjectAcl` | ◐ |
+| Operation      | Supported |
+| -------------- | :-------: |
+| `GetBucketAcl` |     ◐     |
+| `PutBucketAcl` |     ◐     |
+| `GetObjectAcl` |     ◐     |
+| `PutObjectAcl` |     ◐     |
 
 ### Encryption
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetBucketEncryption` | ◐ |
-| `PutBucketEncryption` | ◐ |
-| `DeleteBucketEncryption` | ◐ |
+| Operation                | Supported |
+| ------------------------ | :-------: |
+| `GetBucketEncryption`    |     ◐     |
+| `PutBucketEncryption`    |     ◐     |
+| `DeleteBucketEncryption` |     ◐     |
 
 ### Public access block
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetPublicAccessBlock` | ◐ |
-| `PutPublicAccessBlock` | ◐ |
-| `DeletePublicAccessBlock` | ◐ |
+| Operation                 | Supported |
+| ------------------------- | :-------: |
+| `GetPublicAccessBlock`    |     ◐     |
+| `PutPublicAccessBlock`    |     ◐     |
+| `DeletePublicAccessBlock` |     ◐     |
 
 ### Ownership controls
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetBucketOwnershipControls` | ◐ |
-| `PutBucketOwnershipControls` | ◐ |
-| `DeleteBucketOwnershipControls` | ◐ |
+| Operation                       | Supported |
+| ------------------------------- | :-------: |
+| `GetBucketOwnershipControls`    |     ◐     |
+| `PutBucketOwnershipControls`    |     ◐     |
+| `DeleteBucketOwnershipControls` |     ◐     |
 
 ### Lifecycle
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetBucketLifecycleConfiguration` | ◐ |
-| `PutBucketLifecycleConfiguration` | ◐ |
-| `DeleteBucketLifecycle` | ◐ |
+| Operation                         | Supported |
+| --------------------------------- | :-------: |
+| `GetBucketLifecycleConfiguration` |     ◐     |
+| `PutBucketLifecycleConfiguration` |     ◐     |
+| `DeleteBucketLifecycle`           |     ◐     |
 
 ### Static website hosting
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetBucketWebsite` | ◐ |
-| `PutBucketWebsite` | ◐ |
-| `DeleteBucketWebsite` | ◐ |
+| Operation             | Supported |
+| --------------------- | :-------: |
+| `GetBucketWebsite`    |     ◐     |
+| `PutBucketWebsite`    |     ◐     |
+| `DeleteBucketWebsite` |     ◐     |
 
 :::note
 The website configuration API is accepted and persisted, but kumolo does not serve static website content. The website endpoint is not available.
@@ -173,75 +173,75 @@ The website configuration API is accepted and persisted, but kumolo does not ser
 
 ### Replication
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetBucketReplication` | ◐ |
-| `PutBucketReplication` | ◐ |
-| `DeleteBucketReplication` | ◐ |
+| Operation                 | Supported |
+| ------------------------- | :-------: |
+| `GetBucketReplication`    |     ◐     |
+| `PutBucketReplication`    |     ◐     |
+| `DeleteBucketReplication` |     ◐     |
 
 ### Notification
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetBucketNotificationConfiguration` | ◐ |
-| `PutBucketNotificationConfiguration` | ◐ |
+| Operation                            | Supported |
+| ------------------------------------ | :-------: |
+| `GetBucketNotificationConfiguration` |     ◐     |
+| `PutBucketNotificationConfiguration` |     ◐     |
 
 ### Logging
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetBucketLogging` | ◐ |
-| `PutBucketLogging` | ◐ |
+| Operation          | Supported |
+| ------------------ | :-------: |
+| `GetBucketLogging` |     ◐     |
+| `PutBucketLogging` |     ◐     |
 
 ### Transfer acceleration
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetBucketAccelerateConfiguration` | ◐ |
-| `PutBucketAccelerateConfiguration` | ◐ |
+| Operation                          | Supported |
+| ---------------------------------- | :-------: |
+| `GetBucketAccelerateConfiguration` |     ◐     |
+| `PutBucketAccelerateConfiguration` |     ◐     |
 
 ### Request payment
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetBucketRequestPayment` | ◐ |
-| `PutBucketRequestPayment` | ◐ |
+| Operation                 | Supported |
+| ------------------------- | :-------: |
+| `GetBucketRequestPayment` |     ◐     |
+| `PutBucketRequestPayment` |     ◐     |
 
 ### Analytics
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetBucketAnalyticsConfiguration` | — |
-| `PutBucketAnalyticsConfiguration` | — |
-| `DeleteBucketAnalyticsConfiguration` | — |
-| `ListBucketAnalyticsConfigurations` | — |
+| Operation                            | Supported |
+| ------------------------------------ | :-------: |
+| `GetBucketAnalyticsConfiguration`    |     —     |
+| `PutBucketAnalyticsConfiguration`    |     —     |
+| `DeleteBucketAnalyticsConfiguration` |     —     |
+| `ListBucketAnalyticsConfigurations`  |     —     |
 
 ### Intelligent-Tiering
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetBucketIntelligentTieringConfiguration` | — |
-| `PutBucketIntelligentTieringConfiguration` | — |
-| `DeleteBucketIntelligentTieringConfiguration` | — |
-| `ListBucketIntelligentTieringConfigurations` | — |
+| Operation                                     | Supported |
+| --------------------------------------------- | :-------: |
+| `GetBucketIntelligentTieringConfiguration`    |     —     |
+| `PutBucketIntelligentTieringConfiguration`    |     —     |
+| `DeleteBucketIntelligentTieringConfiguration` |     —     |
+| `ListBucketIntelligentTieringConfigurations`  |     —     |
 
 ### Inventory
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetBucketInventoryConfiguration` | — |
-| `PutBucketInventoryConfiguration` | — |
-| `DeleteBucketInventoryConfiguration` | — |
-| `ListBucketInventoryConfigurations` | — |
+| Operation                            | Supported |
+| ------------------------------------ | :-------: |
+| `GetBucketInventoryConfiguration`    |     —     |
+| `PutBucketInventoryConfiguration`    |     —     |
+| `DeleteBucketInventoryConfiguration` |     —     |
+| `ListBucketInventoryConfigurations`  |     —     |
 
 ### Metrics
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetBucketMetricsConfiguration` | — |
-| `PutBucketMetricsConfiguration` | — |
-| `DeleteBucketMetricsConfiguration` | — |
-| `ListBucketMetricsConfigurations` | — |
+| Operation                          | Supported |
+| ---------------------------------- | :-------: |
+| `GetBucketMetricsConfiguration`    |     —     |
+| `PutBucketMetricsConfiguration`    |     —     |
+| `DeleteBucketMetricsConfiguration` |     —     |
+| `ListBucketMetricsConfigurations`  |     —     |
 
 ## Quick start
 

@@ -85,10 +85,10 @@ This guide gets you from zero to a working S3 or DynamoDB client in under five m
 Once started, kumolo listens on port `5566`. Confirm it is up with:
 
 ```bash
-curl -I http://localhost:5566/
+curl http://localhost:5566/
 ```
 
-You should receive a `404` response — that is expected. Any HTTP response confirms kumolo is accepting connections.
+You should receive a `200` response with an XML body listing your buckets (empty on a fresh start). Any HTTP response confirms kumolo is accepting connections.
 
 ## Connecting your AWS SDK
 
@@ -192,13 +192,16 @@ the AWS SDK requires one to be present.
 
 ## Environment variables
 
-| Variable           | Default  | Description                                                                                   |
-| ------------------ | -------- | --------------------------------------------------------------------------------------------- |
-| `KUMOLO_PORT`      | `5566`   | HTTP listen port                                                                              |
-| `KUMOLO_DATA_DIR`  | _(none)_ | Persistent storage directory. If unset, a temporary directory is created and removed on exit. |
-| `KUMOLO_LOG_LEVEL` | `info`   | Log verbosity: `debug`, `info`, `warn`, `error`                                               |
+| Variable                    | Default  | Description                                                                                   |
+| --------------------------- | -------- | --------------------------------------------------------------------------------------------- |
+| `KUMOLO_PORT`               | `5566`   | HTTP listen port                                                                              |
+| `KUMOLO_DATA_DIR`           | _(none)_ | Persistent storage directory. If unset, a temporary directory is created and removed on exit. |
+| `KUMOLO_LOG_LEVEL`          | `info`   | Log verbosity: `debug`, `info`, `warn`, `error`                                               |
+| `KUMOLO_LIFECYCLE_INTERVAL` | `1m`     | How often S3 lifecycle rules are evaluated and enforced (environment variable only)           |
 
-All variables can also be set as CLI flags using kebab-case (e.g. `--data-dir`, `--log-level`).
+`KUMOLO_PORT`, `KUMOLO_DATA_DIR`, and `KUMOLO_LOG_LEVEL` can also be set as CLI flags using kebab-case (e.g. `-data-dir`, `-log-level`).
+
+If a `.env` file is present in the working directory, kumolo loads it automatically on startup. CLI flags take precedence over `.env` values, which take precedence over built-in defaults.
 
 ## Troubleshooting
 
@@ -210,10 +213,11 @@ check that the container or process started successfully (`docker ps` or check p
 
 ---
 
-**S3: `InvalidBucketName` or requests hitting real AWS**
+**S3: connection error or DNS failure on the first request**
 
 You likely forgot `UsePathStyle = true` on the S3 client. Without it the SDK generates
-virtual-hosted-style URLs (e.g. `my-bucket.localhost`) that do not resolve to kumolo.
+virtual-hosted-style URLs (e.g. `http://my-bucket.localhost:5566/`) that do not resolve,
+causing a connection error rather than reaching kumolo.
 
 ---
 
@@ -233,6 +237,13 @@ Tables are not created automatically. Call `CreateTable` before any operation th
 
 Verify that `BaseEndpoint` is set to `http://localhost:5566` in your DynamoDB client options.
 Unlike S3, DynamoDB does not need `UsePathStyle` — only `BaseEndpoint` is required.
+
+---
+
+**STS: requests hitting real AWS**
+
+Verify that `BaseEndpoint` is set to `http://localhost:5566` in your STS client options.
+Like DynamoDB, STS does not need `UsePathStyle` — only `BaseEndpoint` is required.
 
 ---
 
@@ -261,10 +272,5 @@ docker run -p 5566:5566 -e KUMOLO_LOG_LEVEL=debug ghcr.io/optiflowic/kumolo:late
     title="STS reference"
     href="/kumolo-docs/services/sts/"
     description="Browse all supported STS operations."
-  />
-  <LinkCard
-    title="Contributing"
-    href="/kumolo-docs/contributing/"
-    description="Help improve kumolo and its documentation."
   />
 </CardGrid>

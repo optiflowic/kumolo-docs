@@ -30,10 +30,6 @@ Operations sourced from [`internal/dynamodb/router.go`](https://github.com/optif
 | `ListTables`    |     ✓     |
 | `UpdateTable`   |     ✓     |
 
-:::note
-`UpdateTable` supports modifying provisioned throughput and adding/removing global secondary indexes (GSIs). Local secondary indexes (LSIs) are immutable after table creation, matching AWS behavior.
-:::
-
 ### Item operations
 
 | Operation    | Supported |
@@ -43,11 +39,6 @@ Operations sourced from [`internal/dynamodb/router.go`](https://github.com/optif
 | `DeleteItem` |     ✓     |
 | `UpdateItem` |     ✓     |
 
-:::note
-`PutItem`, `DeleteItem`, and `UpdateItem` support `ConditionExpression` for conditional writes.
-`UpdateItem` supports `UpdateExpression` for atomic attribute updates (`SET`, `REMOVE`, `ADD`, `DELETE`).
-:::
-
 ### Query & scan
 
 | Operation | Supported |
@@ -56,9 +47,7 @@ Operations sourced from [`internal/dynamodb/router.go`](https://github.com/optif
 | `Scan`    |     ✓     |
 
 :::note
-`Query` supports `KeyConditionExpression`, `FilterExpression`, and `ProjectionExpression`.
-`Scan` supports `FilterExpression` and `ProjectionExpression`.
-Both operations support `ExpressionAttributeNames` and `ExpressionAttributeValues`.
+The `Select` parameter is not yet implemented — `Select: COUNT` is silently ignored and items are always returned ([#182](https://github.com/optiflowic/kumolo/issues/182)).
 :::
 
 ### Batch & transactions
@@ -74,8 +63,12 @@ Both operations support `ExpressionAttributeNames` and `ExpressionAttributeValue
 
 | Operation            | Supported |
 | -------------------- | :-------: |
-| `UpdateTimeToLive`   |     ✓     |
-| `DescribeTimeToLive` |     ✓     |
+| `UpdateTimeToLive`   |     ◐     |
+| `DescribeTimeToLive` |     ◐     |
+
+:::note
+TTL can be enabled or disabled and the setting is persisted and returned. Automatic expiry of items is not yet implemented ([#181](https://github.com/optiflowic/kumolo/issues/181)).
+:::
 
 ### Tagging
 
@@ -93,7 +86,7 @@ Both operations support `ExpressionAttributeNames` and `ExpressionAttributeValue
 | `DescribeEndpoints` |     ✓     |
 
 :::note
-`DescribeLimits` returns fixed values (`20` for table and GSI limits). `DescribeEndpoints` returns a single endpoint pointing at `localhost:5566`.
+`DescribeLimits` returns fixed capacity unit values (`AccountMaxReadCapacityUnits`: 80000, `AccountMaxWriteCapacityUnits`: 80000, `TableMaxReadCapacityUnits`: 40000, `TableMaxWriteCapacityUnits`: 40000). `DescribeEndpoints` returns a single endpoint pointing at `localhost:5566`.
 :::
 
 ### Continuous backups (PITR)

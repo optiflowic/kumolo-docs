@@ -19,7 +19,7 @@ export default defineConfig({
         {
           icon: 'github',
           label: 'GitHub',
-          href: 'https://github.com/optiflowic/kumolo-docs',
+          href: 'https://github.com/optiflowic/kumolo',
         },
       ],
       sidebar: [

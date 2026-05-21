@@ -46,9 +46,6 @@ Operations sourced from [`internal/s3/router.go`](https://github.com/optiflowic/
 | `GetObjectTorrent`       |     —     |
 | `WriteGetObjectResponse` |     —     |
 
-:::note
-`RestoreObject`: archive storage class enforcement (restricting access to unrestored objects) is not yet implemented ([#184](https://github.com/optiflowic/kumolo/issues/184)).
-:::
 
 ### Listing
 
@@ -56,11 +53,7 @@ Operations sourced from [`internal/s3/router.go`](https://github.com/optiflowic/
 | -------------------- | :-------: |
 | `ListObjects`        |     ✓     |
 | `ListObjectsV2`      |     ✓     |
-| `ListObjectVersions` |     ◐     |
-
-:::note
-`ListObjectVersions` does not yet support pagination — all versions and delete markers are returned in a single response.
-:::
+| `ListObjectVersions` |     ✓     |
 
 ### Multipart upload
 
@@ -73,10 +66,6 @@ Operations sourced from [`internal/s3/router.go`](https://github.com/optiflowic/
 | `AbortMultipartUpload`    |     ✓     |
 | `ListMultipartUploads`    |     ✓     |
 | `ListParts`               |     ✓     |
-
-:::note
-The 5 MB minimum part size that AWS requires for all parts except the last is not yet enforced ([#183](https://github.com/optiflowic/kumolo/issues/183)). Uploads that succeed on kumolo with small parts may be rejected by real AWS.
-:::
 
 ### Versioning
 
@@ -112,12 +101,9 @@ The 5 MB minimum part size that AWS requires for all parts except the last is no
 | `PutObjectRetention`         |     ✓     |
 | `GetObjectLegalHold`         |     ✓     |
 | `PutObjectLegalHold`         |     ✓     |
-| `GetObjectLockConfiguration` |     ◐     |
-| `PutObjectLockConfiguration` |     ◐     |
+| `GetObjectLockConfiguration` |     ✓     |
+| `PutObjectLockConfiguration` |     ✓     |
 
-:::note
-`GetObjectLockConfiguration` and `PutObjectLockConfiguration`: automatic application of the default retention to newly uploaded objects is not yet implemented ([#185](https://github.com/optiflowic/kumolo/issues/185)).
-:::
 
 ### Location
 
@@ -180,7 +166,7 @@ The 5 MB minimum part size that AWS requires for all parts except the last is no
 | `DeleteBucketLifecycle`           |     ✓     |
 
 :::note
-`Transition` rules and date-based expiration (`Expiration.Date`) are not supported. Only `Expiration` (by days), `NoncurrentVersionExpiration`, and `AbortIncompleteMultipartUpload` are enforced.
+`Transition` rules, date-based expiration (`Expiration.Date`), and `ExpiredObjectDeleteMarker` are not supported. Only `Expiration` (by days), `NoncurrentVersionExpiration`, and `AbortIncompleteMultipartUpload` are enforced.
 :::
 
 ### Static website hosting

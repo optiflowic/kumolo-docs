@@ -46,9 +46,6 @@ Operations sourced from [`internal/dynamodb/router.go`](https://github.com/optif
 | `Query`   |     ✓     |
 | `Scan`    |     ✓     |
 
-:::note
-The `Select` parameter is not yet implemented — `Select: COUNT` is silently ignored and items are always returned ([#182](https://github.com/optiflowic/kumolo/issues/182)).
-:::
 
 ### Batch & transactions
 
@@ -63,12 +60,8 @@ The `Select` parameter is not yet implemented — `Select: COUNT` is silently ig
 
 | Operation            | Supported |
 | -------------------- | :-------: |
-| `UpdateTimeToLive`   |     ◐     |
-| `DescribeTimeToLive` |     ◐     |
-
-:::note
-TTL can be enabled or disabled and the setting is persisted and returned. Automatic expiry of items is not yet implemented ([#181](https://github.com/optiflowic/kumolo/issues/181)).
-:::
+| `UpdateTimeToLive`   |     ✓     |
+| `DescribeTimeToLive` |     ✓     |
 
 ### Tagging
 

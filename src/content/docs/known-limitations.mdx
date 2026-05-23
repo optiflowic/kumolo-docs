@@ -1,0 +1,44 @@
+---
+title: Known Limitations
+description: Behaviors in kumolo that differ from real AWS by design or as a known gap.
+---
+
+kumolo aims for high fidelity, but some behaviors differ from real AWS by design or as a known gap.
+
+## S3
+
+**Bucket Policy and ACL are not enforced**
+
+`PutBucketPolicy`, `GetBucketPolicy`, `PutBucketAcl`, `GetBucketAcl`, `PutObjectAcl`, and `GetObjectAcl` succeed and persist the configuration.
+However, kumolo does not evaluate the stored policy or ACL on subsequent requests — all requests are permitted regardless of their content.
+
+**Lifecycle: date-based rules are not applied**
+
+`Expiration.Date` and `ExpiredObjectDeleteMarker` lifecycle rules are stored and returned by `GetBucketLifecycleConfiguration`, but the background lifecycle enforcement process never evaluates them.
+Only `Expiration.Days`, `NoncurrentVersionExpiration`, and `AbortIncompleteMultipartUpload` rules are enforced.
+
+**SigV4 signatures are not verified**
+
+kumolo parses SigV4 headers and presigned URL parameters to extract request metadata (e.g., expiry time), but does not cryptographically verify the signature.
+Any non-empty `aws_access_key_id` / `aws_secret_access_key` pair is accepted.
+This is intentional for local development — you do not need to manage real credentials.
+
+## DynamoDB
+
+**`ReturnConsumedCapacity` is not implemented**
+
+The parameter is accepted without error, but `ConsumedCapacity` is omitted from all responses.
+Code that reads `ConsumedCapacity` from the response will receive a nil / empty value.
+
+**Number precision is limited to float64**
+
+DynamoDB number attributes are internally stored and compared using `float64`.
+Values with more than 15 significant digits may not sort or compare correctly.
+Real AWS DynamoDB uses arbitrary-precision decimal arithmetic.
+
+## STS
+
+**`AssumeRole` does not simulate distinct roles**
+
+`AssumeRole` always returns the same fixed credentials regardless of the `RoleArn` specified in the request.
+If your code relies on different roles returning different permissions or identities, kumolo cannot simulate that behavior.

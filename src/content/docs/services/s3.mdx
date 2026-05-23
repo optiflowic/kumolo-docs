@@ -164,7 +164,7 @@ Operations sourced from [`internal/s3/router.go`](https://github.com/optiflowic/
 | `DeleteBucketLifecycle`           |     ✓     |
 
 :::note
-`Transition` rules, date-based expiration (`Expiration.Date`), and `ExpiredObjectDeleteMarker` are not supported. Only `Expiration` (by days), `NoncurrentVersionExpiration`, and `AbortIncompleteMultipartUpload` are enforced.
+`Transition` rules are not supported. `Expiration` (by days and by date), `ExpiredObjectDeleteMarker`, `NoncurrentVersionExpiration`, and `AbortIncompleteMultipartUpload` are enforced.
 :::
 
 ### Static website hosting

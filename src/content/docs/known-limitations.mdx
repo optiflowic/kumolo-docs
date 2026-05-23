@@ -12,11 +12,6 @@ kumolo aims for high fidelity, but some behaviors differ from real AWS by design
 `PutBucketPolicy`, `GetBucketPolicy`, `PutBucketAcl`, `GetBucketAcl`, `PutObjectAcl`, and `GetObjectAcl` succeed and persist the configuration.
 However, kumolo does not evaluate the stored policy or ACL on subsequent requests — all requests are permitted regardless of their content.
 
-**Lifecycle: date-based rules are not applied**
-
-`Expiration.Date` and `ExpiredObjectDeleteMarker` lifecycle rules are stored and returned by `GetBucketLifecycleConfiguration`, but the background lifecycle enforcement process never evaluates them.
-Only `Expiration.Days`, `NoncurrentVersionExpiration`, and `AbortIncompleteMultipartUpload` rules are enforced.
-
 **SigV4 signatures are not verified**
 
 kumolo parses SigV4 headers and presigned URL parameters to extract request metadata (e.g., expiry time), but does not cryptographically verify the signature.
@@ -25,10 +20,10 @@ This is intentional for local development — you do not need to manage real cre
 
 ## DynamoDB
 
-**`ReturnConsumedCapacity` is not implemented**
+**`ConsumedCapacity` values are not computed**
 
-The parameter is accepted without error, but `ConsumedCapacity` is omitted from all responses.
-Code that reads `ConsumedCapacity` from the response will receive a nil / empty value.
+`ReturnConsumedCapacity` is fully supported and `ConsumedCapacity` is included in responses when set to `TOTAL` or `INDEXES`.
+However, kumolo always returns `CapacityUnits: 1.0` — actual RCU/WCU are not calculated.
 
 **Number precision is limited to float64**
 

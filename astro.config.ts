@@ -34,6 +34,7 @@ export default defineConfig({
             { label: 'STS', slug: 'services/sts' },
           ],
         },
+        { label: 'Known Limitations', slug: 'known-limitations' },
       ],
     }),
   ],

@@ -1,0 +1,41 @@
+language: en
+
+reviews:
+  profile: assertive
+  request_changes_workflow: true
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+
+  path_instructions:
+    - path: 'src/content/docs/**/*.mdx'
+      instructions: |
+        ## Content Accuracy
+        - Verify that documented operations match the kumolo implementation (internal/s3/router.go, internal/dynamodb/router.go, internal/sts/handler.go in the kumolo repo).
+        - Flag any operation listed in docs that is not yet implemented in kumolo.
+        - Flag any environment variable that does not match internal/config/env.go.
+
+        ## Writing Quality
+        - Content must be in English.
+        - Sentences should be concise and direct. Flag passive voice where active is clearer.
+        - Code examples must be syntactically correct and runnable as-is.
+        - Flag broken or relative links that won't resolve on the published site.
+
+    - path: '.github/workflows/**'
+      instructions: |
+        ## CI/CD Security
+        - All third-party actions must be pinned to a full commit SHA, not a tag or branch.
+        - actions/checkout steps must include persist-credentials: false unless a subsequent step explicitly needs to push or pull via git.
+        - Avoid broad restore-keys fallbacks in cache steps for security-sensitive jobs (deploy, release).
+
+  finishing_touches:
+    docstrings:
+      enabled: false
+
+knowledge_base:
+  linked_repos:
+    - optiflowic/kumolo
+
+chat:
+  auto_reply: true

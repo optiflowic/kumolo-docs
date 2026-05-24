@@ -9,7 +9,7 @@ reviews:
   collapse_walkthrough: false
 
   path_instructions:
-    - path: "src/content/docs/**/*.mdx"
+    - path: 'src/content/docs/**/*.mdx'
       instructions: |
         ## Content Accuracy
         - Verify that documented operations match the kumolo implementation (internal/s3/router.go, internal/dynamodb/router.go, internal/sts/handler.go in the kumolo repo).
@@ -22,7 +22,7 @@ reviews:
         - Code examples must be syntactically correct and runnable as-is.
         - Flag broken or relative links that won't resolve on the published site.
 
-    - path: ".github/workflows/**"
+    - path: '.github/workflows/**'
       instructions: |
         ## CI/CD Security
         - All third-party actions must be pinned to a full commit SHA, not a tag or branch.

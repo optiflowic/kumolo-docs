@@ -33,5 +33,9 @@ reviews:
     docstrings:
       enabled: false
 
+knowledge_base:
+  linked_repos:
+    - optiflowic/kumolo
+
 chat:
   auto_reply: true

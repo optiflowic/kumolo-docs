@@ -216,13 +216,15 @@ Grants are stored and listed correctly. Grant-based access control (grantee prin
 
     CIPHERTEXT=$(aws kms encrypt \
       --key-id "$KEY_ID" \
-      --plaintext "hello, kumolo" \
+      --plaintext fileb://<(printf %s "hello, kumolo") \
       --endpoint-url http://localhost:5566 \
+      --region us-east-1 \
       --query CiphertextBlob --output text)
 
     aws kms decrypt \
       --ciphertext-blob "$CIPHERTEXT" \
       --endpoint-url http://localhost:5566 \
+      --region us-east-1 \
       --query Plaintext --output text | base64 -d
     ```
 

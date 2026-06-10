@@ -9,11 +9,11 @@ kumolo implements the S3 REST API. All operations accept standard AWS SDK v2 req
 
 ## Support levels
 
-| Symbol | Meaning                                                                                                                                                                    |
-| :----: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|   ✓    | Fully implemented — the feature behaves like real AWS                                                                                                                      |
+| Symbol | Meaning                                                                                   |
+| :----: | ----------------------------------------------------------------------------------------- |
+|   ✓    | Fully implemented — the feature behaves like real AWS                                     |
 |   ◐    | Partial support — the operation works but has known limitations; see the note for details |
-|   —    | Not yet implemented                                                                                                                                                        |
+|   —    | Not yet implemented                                                                       |
 
 ## Operation support
 
@@ -163,11 +163,12 @@ ACL is stored and enforced on object reads. Individual grant headers (e.g. `x-am
 Bucket default encryption is applied to `PutObject`, `CopyObject`, and `CreateMultipartUpload` when no per-request SSE header is supplied.
 
 Supported SSE types:
+
 - **AES256** — objects are encrypted with AES-256-GCM using a per-object random key
 - **aws:kms** — the specified KMS key (or the bucket default) is validated and the key ARN is stored; the object body is encrypted using a data key generated via KMS
 - **aws:kms:dsse** — same as aws:kms with dual-layer header behaviour
 - **SSE-C** — the customer-provided key is used to encrypt and decrypt the object; the key itself is not stored
-:::
+  :::
 
 ### Public access block
 

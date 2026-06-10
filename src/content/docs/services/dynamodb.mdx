@@ -10,11 +10,11 @@ Unlike S3, `UsePathStyle` is not required; only `BaseEndpoint` needs to be overr
 
 ## Support levels
 
-| Symbol | Meaning                                                                                                                                                                        |
-| :----: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-|   ✓    | Fully implemented — the feature behaves like real AWS                                                                                                                          |
+| Symbol | Meaning                                                                                   |
+| :----: | ----------------------------------------------------------------------------------------- |
+|   ✓    | Fully implemented — the feature behaves like real AWS                                     |
 |   ◐    | Partial support — the operation works but has known limitations; see the note for details |
-|   —    | Not yet implemented                                                                                                                                                            |
+|   —    | Not yet implemented                                                                       |
 
 ## Operation support
 
@@ -91,12 +91,12 @@ Parallel scan: `Segment` and `TotalSegments` are validated but the keyspace is n
 
 ### Streams
 
-| Operation            | Supported |
-| -------------------- | :-------: |
-| `ListStreams`         |     ✓     |
-| `DescribeStream`     |     ✓     |
-| `GetShardIterator`   |     ✓     |
-| `GetRecords`         |     ✓     |
+| Operation          | Supported |
+| ------------------ | :-------: |
+| `ListStreams`      |     ✓     |
+| `DescribeStream`   |     ✓     |
+| `GetShardIterator` |     ✓     |
+| `GetRecords`       |     ✓     |
 
 :::note
 DynamoDB Streams records `INSERT`, `MODIFY`, and `REMOVE` events for all tables. `StreamViewType` is honoured (`KEYS_ONLY`, `NEW_IMAGE`, `OLD_IMAGE`, `NEW_AND_OLD_IMAGES`). Shard iterators expire after 15 minutes of inactivity, matching real AWS behaviour.
@@ -104,11 +104,11 @@ DynamoDB Streams records `INSERT`, `MODIFY`, and `REMOVE` events for all tables.
 
 ### PartiQL
 
-| Operation                | Supported |
-| ------------------------ | :-------: |
-| `ExecuteStatement`       |     ✓     |
-| `BatchExecuteStatement`  |     ✓     |
-| `ExecuteTransaction`     |     ✓     |
+| Operation               | Supported |
+| ----------------------- | :-------: |
+| `ExecuteStatement`      |     ✓     |
+| `BatchExecuteStatement` |     ✓     |
+| `ExecuteTransaction`    |     ✓     |
 
 ### Continuous backups (PITR)
 

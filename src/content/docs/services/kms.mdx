@@ -21,32 +21,32 @@ Operations sourced from [`internal/kms/router.go`](https://github.com/optiflowic
 
 ### Key management
 
-| Operation       | Supported |
-| --------------- | :-------: |
-| `CreateKey`     |     ✓     |
-| `DescribeKey`   |     ✓     |
-| `ListKeys`      |     ✓     |
-| `GetKeyPolicy`  |     ✓     |
-| `PutKeyPolicy`  |     ✓     |
+| Operation      | Supported |
+| -------------- | :-------: |
+| `CreateKey`    |     ✓     |
+| `DescribeKey`  |     ✓     |
+| `ListKeys`     |     ✓     |
+| `GetKeyPolicy` |     ✓     |
+| `PutKeyPolicy` |     ✓     |
 
 ### Key lifecycle
 
-| Operation               | Supported |
-| ----------------------- | :-------: |
-| `EnableKey`             |     ✓     |
-| `DisableKey`            |     ✓     |
-| `ScheduleKeyDeletion`   |     ✓     |
-| `CancelKeyDeletion`     |     ✓     |
+| Operation             | Supported |
+| --------------------- | :-------: |
+| `EnableKey`           |     ✓     |
+| `DisableKey`          |     ✓     |
+| `ScheduleKeyDeletion` |     ✓     |
+| `CancelKeyDeletion`   |     ✓     |
 
 ### Key rotation
 
-| Operation               | Supported |
-| ----------------------- | :-------: |
-| `EnableKeyRotation`     |     ✓     |
-| `DisableKeyRotation`    |     ✓     |
-| `GetKeyRotationStatus`  |     ✓     |
-| `RotateKeyOnDemand`     |     ✓     |
-| `ListKeyRotations`      |     ✓     |
+| Operation              | Supported |
+| ---------------------- | :-------: |
+| `EnableKeyRotation`    |     ✓     |
+| `DisableKeyRotation`   |     ✓     |
+| `GetKeyRotationStatus` |     ✓     |
+| `RotateKeyOnDemand`    |     ✓     |
+| `ListKeyRotations`     |     ✓     |
 
 :::note
 Automatic key rotation is not executed on a background schedule — kumolo stores the rotation configuration and honours it in `GetKeyRotationStatus`, but does not rotate keys automatically at the configured interval. Use `RotateKeyOnDemand` to trigger an immediate rotation in tests.
@@ -54,31 +54,31 @@ Automatic key rotation is not executed on a background schedule — kumolo store
 
 ### Aliases
 
-| Operation       | Supported |
-| --------------- | :-------: |
-| `CreateAlias`   |     ✓     |
-| `DeleteAlias`   |     ✓     |
-| `UpdateAlias`   |     ✓     |
-| `ListAliases`   |     ✓     |
+| Operation     | Supported |
+| ------------- | :-------: |
+| `CreateAlias` |     ✓     |
+| `DeleteAlias` |     ✓     |
+| `UpdateAlias` |     ✓     |
+| `ListAliases` |     ✓     |
 
 ### Data plane (symmetric)
 
-| Operation                           | Supported |
-| ----------------------------------- | :-------: |
-| `Encrypt`                           |     ✓     |
-| `Decrypt`                           |     ✓     |
-| `GenerateDataKey`                   |     ✓     |
-| `GenerateDataKeyWithoutPlaintext`   |     ✓     |
-| `GenerateRandom`                    |     ✓     |
-| `ReEncrypt`                         |     ◐     |
+| Operation                         | Supported |
+| --------------------------------- | :-------: |
+| `Encrypt`                         |     ✓     |
+| `Decrypt`                         |     ✓     |
+| `GenerateDataKey`                 |     ✓     |
+| `GenerateDataKeyWithoutPlaintext` |     ✓     |
+| `GenerateRandom`                  |     ✓     |
+| `ReEncrypt`                       |     ◐     |
 
 ### Asymmetric keys
 
-| Operation                                | Supported |
-| ---------------------------------------- | :-------: |
-| `GetPublicKey`                           |     ✓     |
-| `GenerateDataKeyPair`                    |     ◐     |
-| `GenerateDataKeyPairWithoutPlaintext`    |     ◐     |
+| Operation                             | Supported |
+| ------------------------------------- | :-------: |
+| `GetPublicKey`                        |     ✓     |
+| `GenerateDataKeyPair`                 |     ◐     |
+| `GenerateDataKeyPairWithoutPlaintext` |     ◐     |
 
 :::note
 `GenerateDataKeyPair` and `GenerateDataKeyPairWithoutPlaintext`: `ECC_SECG_P256K1` and `SM2` key specs are not supported and return `UnsupportedOperationException`. All RSA and other ECC specs are fully supported. `ReEncrypt` between two asymmetric keys is not supported and returns `InvalidKeyUsageException`; symmetric-to-symmetric and symmetric-to-asymmetric re-encryption work correctly.
@@ -86,10 +86,10 @@ Automatic key rotation is not executed on a background schedule — kumolo store
 
 ### Sign & verify
 
-| Operation  | Supported |
-| ---------- | :-------: |
-| `Sign`     |     ◐     |
-| `Verify`   |     ◐     |
+| Operation | Supported |
+| --------- | :-------: |
+| `Sign`    |     ◐     |
+| `Verify`  |     ◐     |
 
 :::note
 Unsupported signing algorithms: `ED25519_PH_SHA_512`, `SM2DSA`, and all `ML_DSA` variants. These return `UnsupportedOperationException`. All other algorithms (`ECDSA_*`, `RSASSA_*`, `ED25519_SHA_512`) are fully supported.
@@ -112,13 +112,13 @@ Unsupported signing algorithms: `ED25519_PH_SHA_512`, `SM2DSA`, and all `ML_DSA`
 
 ### Grants
 
-| Operation              | Supported |
-| ---------------------- | :-------: |
-| `CreateGrant`          |     ✓     |
-| `ListGrants`           |     ✓     |
-| `RevokeGrant`          |     ✓     |
-| `RetireGrant`          |     ✓     |
-| `ListRetirableGrants`  |     ✓     |
+| Operation             | Supported |
+| --------------------- | :-------: |
+| `CreateGrant`         |     ✓     |
+| `ListGrants`          |     ✓     |
+| `RevokeGrant`         |     ✓     |
+| `RetireGrant`         |     ✓     |
+| `ListRetirableGrants` |     ✓     |
 
 :::note
 Grants are stored and listed correctly. Grant-based access control (grantee principal enforcement, grant constraint evaluation) is not implemented — kumolo does not restrict operations based on the grant's `Operations` list or `Constraints`.
@@ -126,11 +126,11 @@ Grants are stored and listed correctly. Grant-based access control (grantee prin
 
 ### Not yet implemented
 
-| Feature                         | Notes                                  |
-| ------------------------------- | -------------------------------------- |
-| Custom key stores                | CloudHSM-backed keys not supported     |
-| Multi-region keys               | `MultiRegion: true` is accepted but not replicated |
-| Key agreements (`DeriveSharedSecret`) | —                               |
+| Feature                               | Notes                                              |
+| ------------------------------------- | -------------------------------------------------- |
+| Custom key stores                     | CloudHSM-backed keys not supported                 |
+| Multi-region keys                     | `MultiRegion: true` is accepted but not replicated |
+| Key agreements (`DeriveSharedSecret`) | —                                                  |
 
 ## Quick start
 

@@ -9,11 +9,11 @@ kumolo implements the S3 REST API. All operations accept standard AWS SDK v2 req
 
 ## Support levels
 
-| Symbol | Meaning                                                                                                                                                                    |
-| :----: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|   ✓    | Fully implemented — the feature behaves like real AWS                                                                                                                      |
-|   ◐    | Config stored — the API call succeeds and the configuration is persisted and returned, but the underlying feature does not run (e.g. no event delivery, no log forwarding) |
-|   —    | Not yet implemented                                                                                                                                                        |
+| Symbol | Meaning                                                                                   |
+| :----: | ----------------------------------------------------------------------------------------- |
+|   ✓    | Fully implemented — the feature behaves like real AWS                                     |
+|   ◐    | Partial support — the operation works but has known limitations; see the note for details |
+|   —    | Not yet implemented                                                                       |
 
 ## Operation support
 
@@ -26,9 +26,13 @@ Operations sourced from [`internal/s3/router.go`](https://github.com/optiflowic/
 | `CreateBucket`         |     ✓     |
 | `DeleteBucket`         |     ✓     |
 | `HeadBucket`           |     ✓     |
-| `ListBuckets`          |     ✓     |
+| `ListBuckets`          |     ◐     |
 | `ListDirectoryBuckets` |     —     |
 | `CreateSession`        |     —     |
+
+:::note
+`ListBuckets` pagination (`max-buckets`, `continuation-token`) is not implemented — all buckets are returned in a single response. `prefix` and `bucket-region` filters are ignored.
+:::
 
 ### Object operations
 
@@ -41,18 +45,26 @@ Operations sourced from [`internal/s3/router.go`](https://github.com/optiflowic/
 | `HeadObject`             |     ✓     |
 | `CopyObject`             |     ✓     |
 | `GetObjectAttributes`    |     ✓     |
-| `RestoreObject`          |     ✓     |
-| `SelectObjectContent`    |     —     |
+| `RestoreObject`          |     ◐     |
+| `SelectObjectContent`    |     ◐     |
 | `GetObjectTorrent`       |     —     |
 | `WriteGetObjectResponse` |     —     |
+
+:::note
+`SelectObjectContent` supports CSV and JSON input with CSV and JSON output. Parquet input is not supported and returns an error. `RestoreObject` does not support the `versionId` query parameter; only the current version can be restored.
+:::
 
 ### Listing
 
 | Operation            | Supported |
 | -------------------- | :-------: |
-| `ListObjects`        |     ✓     |
-| `ListObjectsV2`      |     ✓     |
-| `ListObjectVersions` |     ✓     |
+| `ListObjects`        |     ◐     |
+| `ListObjectsV2`      |     ◐     |
+| `ListObjectVersions` |     ◐     |
+
+:::note
+`encoding-type=url` is not implemented for `ListObjects` and `ListObjectsV2` — keys containing special characters are returned as-is. For `ListObjectVersions`, `version-id-marker` (tiebreaking within the same key) is not implemented; only `key-marker` is supported.
+:::
 
 ### Multipart upload
 
@@ -63,15 +75,23 @@ Operations sourced from [`internal/s3/router.go`](https://github.com/optiflowic/
 | `UploadPartCopy`          |     ✓     |
 | `CompleteMultipartUpload` |     ✓     |
 | `AbortMultipartUpload`    |     ✓     |
-| `ListMultipartUploads`    |     ✓     |
+| `ListMultipartUploads`    |     ◐     |
 | `ListParts`               |     ✓     |
+
+:::note
+`ListMultipartUploads`: `upload-id-marker` tiebreaking within the same key is not implemented; only `key-marker` pagination is supported.
+:::
 
 ### Versioning
 
 | Operation             | Supported |
 | --------------------- | :-------: |
 | `GetBucketVersioning` |     ✓     |
-| `PutBucketVersioning` |     ✓     |
+| `PutBucketVersioning` |     ◐     |
+
+:::note
+`PutBucketVersioning`: the `x-amz-mfa` header (MFA delete) is not supported and is silently ignored.
+:::
 
 ### CORS
 
@@ -122,22 +142,33 @@ Operations sourced from [`internal/s3/router.go`](https://github.com/optiflowic/
 
 | Operation      | Supported |
 | -------------- | :-------: |
-| `GetBucketAcl` |     ◐     |
+| `GetBucketAcl` |     ✓     |
 | `PutBucketAcl` |     ◐     |
 | `GetObjectAcl` |     ◐     |
 | `PutObjectAcl` |     ◐     |
+
+:::note
+ACL is stored and enforced on object reads. Individual grant headers (e.g. `x-amz-grant-read`, `x-amz-grant-write`) are not supported in `PutBucketAcl` and `PutObjectAcl` — use the canned ACL or XML body form. The `versionId` query parameter is not supported on `GetObjectAcl` and `PutObjectAcl`; ACL applies to the current version only.
+:::
 
 ### Encryption
 
 | Operation                | Supported |
 | ------------------------ | :-------: |
-| `GetBucketEncryption`    |     ◐     |
-| `PutBucketEncryption`    |     ◐     |
-| `DeleteBucketEncryption` |     ◐     |
+| `GetBucketEncryption`    |     ✓     |
+| `PutBucketEncryption`    |     ✓     |
+| `DeleteBucketEncryption` |     ✓     |
 
 :::note
-`x-amz-server-side-encryption` and `x-amz-server-side-encryption-aws-kms-key-id` headers on `PutObject` and `CopyObject` are accepted, stored, and echoed back on `GetObject` and `HeadObject`. No actual encryption is performed.
-:::
+Bucket default encryption is applied to `PutObject`, `CopyObject`, and `CreateMultipartUpload` when no per-request SSE header is supplied.
+
+Supported SSE types:
+
+- **AES256** — objects are encrypted with AES-256-GCM using a per-object random key
+- **aws:kms** — the specified KMS key (or the bucket default) is validated and the key ARN is stored; the object body is encrypted using a data key generated via KMS
+- **aws:kms:dsse** — same as aws:kms with dual-layer header behaviour
+- **SSE-C** — the customer-provided key is used to encrypt and decrypt the object; the key itself is not stored
+  :::
 
 ### Public access block
 
@@ -183,9 +214,13 @@ The website configuration API is accepted and persisted, but kumolo does not ser
 
 | Operation                 | Supported |
 | ------------------------- | :-------: |
-| `GetBucketReplication`    |     ◐     |
-| `PutBucketReplication`    |     ◐     |
-| `DeleteBucketReplication` |     ◐     |
+| `GetBucketReplication`    |     ✓     |
+| `PutBucketReplication`    |     ✓     |
+| `DeleteBucketReplication` |     ✓     |
+
+:::note
+Replication is executed synchronously within the same kumolo instance. Cross-instance replication to a real AWS destination is not supported. Delete marker replication is not implemented. Tag-based filter rules are ignored — only key prefix matching is applied.
+:::
 
 ### Notification
 
@@ -198,8 +233,12 @@ The website configuration API is accepted and persisted, but kumolo does not ser
 
 | Operation          | Supported |
 | ------------------ | :-------: |
-| `GetBucketLogging` |     ◐     |
-| `PutBucketLogging` |     ◐     |
+| `GetBucketLogging` |     ✓     |
+| `PutBucketLogging` |     ✓     |
+
+:::note
+Access logs are written to the configured target bucket in S3 server access log format. Each request produces one log object (real AWS batches multiple records per file). Fields not tracked by kumolo (`bucket-owner`, `request-id`, `object-size`, etc.) are emitted as `-`.
+:::
 
 ### Transfer acceleration
 

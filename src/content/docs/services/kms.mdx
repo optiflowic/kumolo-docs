@@ -1,0 +1,232 @@
+---
+title: KMS
+description: Supported KMS operations in kumolo.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+kumolo implements the AWS KMS API. All operations accept standard AWS SDK v2 requests — point your client at `http://localhost:5566`.
+
+## Support levels
+
+| Symbol | Meaning                                                                                   |
+| :----: | ----------------------------------------------------------------------------------------- |
+|   ✓    | Fully implemented — the feature behaves like real AWS                                     |
+|   ◐    | Partial support — the operation works but has known limitations; see the note for details |
+|   —    | Not yet implemented                                                                       |
+
+## Operation support
+
+Operations sourced from [`internal/kms/router.go`](https://github.com/optiflowic/kumolo/blob/main/internal/kms/router.go) in the kumolo repository.
+
+### Key management
+
+| Operation      | Supported |
+| -------------- | :-------: |
+| `CreateKey`    |     ✓     |
+| `DescribeKey`  |     ✓     |
+| `ListKeys`     |     ✓     |
+| `GetKeyPolicy` |     ✓     |
+| `PutKeyPolicy` |     ✓     |
+
+### Key lifecycle
+
+| Operation             | Supported |
+| --------------------- | :-------: |
+| `EnableKey`           |     ✓     |
+| `DisableKey`          |     ✓     |
+| `ScheduleKeyDeletion` |     ✓     |
+| `CancelKeyDeletion`   |     ✓     |
+
+### Key rotation
+
+| Operation              | Supported |
+| ---------------------- | :-------: |
+| `EnableKeyRotation`    |     ✓     |
+| `DisableKeyRotation`   |     ✓     |
+| `GetKeyRotationStatus` |     ✓     |
+| `RotateKeyOnDemand`    |     ✓     |
+| `ListKeyRotations`     |     ✓     |
+
+:::note
+Automatic key rotation is not executed on a background schedule — kumolo stores the rotation configuration and honours it in `GetKeyRotationStatus`, but does not rotate keys automatically at the configured interval. Use `RotateKeyOnDemand` to trigger an immediate rotation in tests.
+:::
+
+### Aliases
+
+| Operation     | Supported |
+| ------------- | :-------: |
+| `CreateAlias` |     ✓     |
+| `DeleteAlias` |     ✓     |
+| `UpdateAlias` |     ✓     |
+| `ListAliases` |     ✓     |
+
+### Data plane (symmetric)
+
+| Operation                         | Supported |
+| --------------------------------- | :-------: |
+| `Encrypt`                         |     ✓     |
+| `Decrypt`                         |     ✓     |
+| `GenerateDataKey`                 |     ✓     |
+| `GenerateDataKeyWithoutPlaintext` |     ✓     |
+| `GenerateRandom`                  |     ✓     |
+| `ReEncrypt`                       |     ◐     |
+
+### Asymmetric keys
+
+| Operation                             | Supported |
+| ------------------------------------- | :-------: |
+| `GetPublicKey`                        |     ✓     |
+| `GenerateDataKeyPair`                 |     ◐     |
+| `GenerateDataKeyPairWithoutPlaintext` |     ◐     |
+
+:::note
+`GenerateDataKeyPair` and `GenerateDataKeyPairWithoutPlaintext`: `ECC_SECG_P256K1` and `SM2` key specs are not supported and return `UnsupportedOperationException`. All RSA and other ECC specs are fully supported. `ReEncrypt` between two asymmetric keys is not supported and returns `InvalidKeyUsageException`; symmetric-to-symmetric and symmetric-to-asymmetric re-encryption work correctly.
+:::
+
+### Sign & verify
+
+| Operation | Supported |
+| --------- | :-------: |
+| `Sign`    |     ◐     |
+| `Verify`  |     ◐     |
+
+:::note
+Unsupported signing algorithms: `ED25519_PH_SHA_512`, `SM2DSA`, and all `ML_DSA` variants. These return `UnsupportedOperationException`. All other algorithms (`ECDSA_*`, `RSASSA_*`, `ED25519_SHA_512`) are fully supported.
+:::
+
+### MAC
+
+| Operation     | Supported |
+| ------------- | :-------: |
+| `GenerateMac` |     ✓     |
+| `VerifyMac`   |     ✓     |
+
+### Tagging
+
+| Operation          | Supported |
+| ------------------ | :-------: |
+| `TagResource`      |     ✓     |
+| `UntagResource`    |     ✓     |
+| `ListResourceTags` |     ✓     |
+
+### Grants
+
+| Operation             | Supported |
+| --------------------- | :-------: |
+| `CreateGrant`         |     ✓     |
+| `ListGrants`          |     ✓     |
+| `RevokeGrant`         |     ✓     |
+| `RetireGrant`         |     ✓     |
+| `ListRetirableGrants` |     ✓     |
+
+:::note
+Grants are stored and listed correctly. Grant-based access control (grantee principal enforcement, grant constraint evaluation) is not implemented — kumolo does not restrict operations based on the grant's `Operations` list or `Constraints`.
+:::
+
+### Not yet implemented
+
+| Feature                               | Notes                                              |
+| ------------------------------------- | -------------------------------------------------- |
+| Custom key stores                     | CloudHSM-backed keys not supported                 |
+| Multi-region keys                     | `MultiRegion: true` is accepted but not replicated |
+| Key agreements (`DeriveSharedSecret`) | —                                                  |
+
+## Quick start
+
+<Tabs>
+  <TabItem label="Go">
+    ```go
+    import (
+        "context"
+
+        "github.com/aws/aws-sdk-go-v2/aws"
+        "github.com/aws/aws-sdk-go-v2/config"
+        "github.com/aws/aws-sdk-go-v2/credentials"
+        "github.com/aws/aws-sdk-go-v2/service/kms"
+    )
+
+    cfg, err := config.LoadDefaultConfig(context.Background(),
+        config.WithRegion("us-east-1"),
+        config.WithCredentialsProvider(
+            credentials.NewStaticCredentialsProvider("test", "test", ""),
+        ),
+    )
+    if err != nil {
+        panic(err)
+    }
+
+    client := kms.NewFromConfig(cfg, func(o *kms.Options) {
+        o.BaseEndpoint = aws.String("http://localhost:5566")
+    })
+
+    key, err := client.CreateKey(context.Background(), &kms.CreateKeyInput{
+        Description: aws.String("my-key"),
+    })
+    if err != nil {
+        panic(err)
+    }
+
+    encrypted, err := client.Encrypt(context.Background(), &kms.EncryptInput{
+        KeyId:     key.KeyMetadata.KeyId,
+        Plaintext: []byte("hello, kumolo"),
+    })
+    if err != nil {
+        panic(err)
+    }
+
+    decrypted, err := client.Decrypt(context.Background(), &kms.DecryptInput{
+        CiphertextBlob: encrypted.CiphertextBlob,
+    })
+    if err != nil {
+        panic(err)
+    }
+    _ = decrypted.Plaintext // []byte("hello, kumolo")
+    ```
+
+  </TabItem>
+  <TabItem label="Python (boto3)">
+    ```python
+    import boto3
+
+    kms = boto3.client(
+        "kms",
+        region_name="us-east-1",
+        endpoint_url="http://localhost:5566",
+        aws_access_key_id="test",
+        aws_secret_access_key="test",
+    )
+
+    key = kms.create_key(Description="my-key")
+    key_id = key["KeyMetadata"]["KeyId"]
+
+    encrypted = kms.encrypt(KeyId=key_id, Plaintext=b"hello, kumolo")
+    decrypted = kms.decrypt(CiphertextBlob=encrypted["CiphertextBlob"])
+    print(decrypted["Plaintext"])  # b"hello, kumolo"
+    ```
+
+  </TabItem>
+  <TabItem label="AWS CLI">
+    ```bash
+    KEY_ID=$(aws kms create-key \
+      --description "my-key" \
+      --endpoint-url http://localhost:5566 \
+      --region us-east-1 \
+      --query KeyMetadata.KeyId --output text)
+
+    CIPHERTEXT=$(aws kms encrypt \
+      --key-id "$KEY_ID" \
+      --plaintext fileb://<(printf %s "hello, kumolo") \
+      --endpoint-url http://localhost:5566 \
+      --region us-east-1 \
+      --query CiphertextBlob --output text)
+
+    aws kms decrypt \
+      --ciphertext-blob "$CIPHERTEXT" \
+      --endpoint-url http://localhost:5566 \
+      --region us-east-1 \
+      --query Plaintext --output text | base64 -d
+    ```
+
+  </TabItem>
+</Tabs>

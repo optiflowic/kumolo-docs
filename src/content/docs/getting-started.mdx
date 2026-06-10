@@ -3,7 +3,7 @@ title: Getting Started
 description: Install and configure kumolo for local development.
 ---
 
-import { Tabs, TabItem, LinkCard, CardGrid } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 kumolo runs as a local HTTP server that accepts standard AWS SDK v2 requests.
 This guide gets you from zero to a working S3 or DynamoDB client in under five minutes.
@@ -262,22 +262,3 @@ Set `KUMOLO_LOG_LEVEL=debug` to log every incoming request:
 docker run -p 5566:5566 -e KUMOLO_LOG_LEVEL=debug ghcr.io/optiflowic/kumolo:latest
 ```
 
-## Next steps
-
-<CardGrid>
-  <LinkCard
-    title="S3 reference"
-    href="/kumolo-docs/services/s3/"
-    description="Browse all supported S3 operations."
-  />
-  <LinkCard
-    title="DynamoDB reference"
-    href="/kumolo-docs/services/dynamodb/"
-    description="Browse all supported DynamoDB operations."
-  />
-  <LinkCard
-    title="STS reference"
-    href="/kumolo-docs/services/sts/"
-    description="Browse all supported STS operations."
-  />
-</CardGrid>

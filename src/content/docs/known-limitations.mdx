@@ -7,16 +7,28 @@ kumolo aims for high fidelity, but some behaviors differ from real AWS by design
 
 ## S3
 
-**Bucket Policy and ACL are not enforced**
+**Bucket Policy is not enforced**
 
-`PutBucketPolicy`, `GetBucketPolicy`, `PutBucketAcl`, `GetBucketAcl`, `PutObjectAcl`, and `GetObjectAcl` succeed and persist the configuration.
-However, kumolo does not evaluate the stored policy or ACL on subsequent requests — all requests are permitted regardless of their content.
+`PutBucketPolicy`, `GetBucketPolicy`, and `DeleteBucketPolicy` succeed and persist the configuration.
+However, kumolo does not evaluate the stored policy on subsequent requests — all requests are permitted regardless of the policy content.
+
+**ACL: individual grant headers are not supported**
+
+ACL is stored and enforced on object reads. However, `PutObjectAcl` does not support individual grant headers (e.g. `x-amz-grant-read`). Use the canned ACL or the XML request body form instead. The `versionId` query parameter on `GetObjectAcl` and `PutObjectAcl` is not supported.
 
 **SigV4 signatures are not verified**
 
 kumolo parses SigV4 headers and presigned URL parameters to extract request metadata (e.g., expiry time), but does not cryptographically verify the signature.
 Any non-empty `aws_access_key_id` / `aws_secret_access_key` pair is accepted.
 This is intentional for local development — you do not need to manage real credentials.
+
+**Replication: same-instance only**
+
+`PutBucketReplication` is accepted and replication runs synchronously within the same kumolo instance. Cross-instance and real-AWS destinations are not supported. Delete marker replication is not implemented. Tag-based filter rules in replication configurations are ignored — only key prefix matching is applied.
+
+**Logging: one log object per request**
+
+Access logs are written to the target bucket, but each request produces exactly one log object. Real AWS batches multiple access log records into a single file. Fields not tracked by kumolo (`bucket-owner`, `request-id`, `object-size`, etc.) are emitted as `-`.
 
 ## DynamoDB
 
@@ -30,6 +42,16 @@ However, kumolo always returns `CapacityUnits: 1.0` — actual RCU/WCU are not c
 DynamoDB number attributes are internally stored and compared using `float64`.
 Values with more than 15 significant digits may not sort or compare correctly.
 Real AWS DynamoDB uses arbitrary-precision decimal arithmetic.
+
+## KMS
+
+**Grant-based access control is not enforced**
+
+`CreateGrant`, `ListGrants`, `RevokeGrant`, `RetireGrant`, and `ListRetirableGrants` are fully implemented. However, kumolo does not restrict KMS operations based on a grant's `Operations` list or `Constraints` — all operations succeed regardless of whether a grant authorises them.
+
+**Automatic key rotation does not run on a schedule**
+
+`EnableKeyRotation` stores the rotation configuration and `GetKeyRotationStatus` returns it correctly. However, kumolo does not rotate keys automatically at the configured interval. Use `RotateKeyOnDemand` to trigger a rotation in tests.
 
 ## STS
 

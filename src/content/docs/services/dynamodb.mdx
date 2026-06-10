@@ -13,7 +13,7 @@ Unlike S3, `UsePathStyle` is not required; only `BaseEndpoint` needs to be overr
 | Symbol | Meaning                                                                                                                                                                        |
 | :----: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 |   ✓    | Fully implemented — the feature behaves like real AWS                                                                                                                          |
-|   ◐    | Config stored — the API call succeeds and the configuration is persisted and returned, but the underlying feature does not run (e.g. no backups created, no stream forwarding) |
+|   ◐    | Partial support — the operation works but has known limitations; see the note for details |
 |   —    | Not yet implemented                                                                                                                                                            |
 
 ## Operation support
@@ -44,7 +44,11 @@ Operations sourced from [`internal/dynamodb/router.go`](https://github.com/optif
 | Operation | Supported |
 | --------- | :-------: |
 | `Query`   |     ✓     |
-| `Scan`    |     ✓     |
+| `Scan`    |     ◐     |
+
+:::note
+Parallel scan: `Segment` and `TotalSegments` are validated but the keyspace is not physically partitioned. All segments return the full dataset. Suitable for testing parallel scan SDK usage but not for workload distribution.
+:::
 
 ### Batch & transactions
 
@@ -68,7 +72,11 @@ Operations sourced from [`internal/dynamodb/router.go`](https://github.com/optif
 | -------------------- | :-------: |
 | `TagResource`        |     ✓     |
 | `UntagResource`      |     ✓     |
-| `ListTagsOfResource` |     ✓     |
+| `ListTagsOfResource` |     ◐     |
+
+:::note
+`ListTagsOfResource` pagination is not implemented — `NextToken` is accepted but ignored and all tags are returned in a single response.
+:::
 
 ### Limits & endpoints
 
@@ -80,6 +88,27 @@ Operations sourced from [`internal/dynamodb/router.go`](https://github.com/optif
 :::note
 `DescribeLimits` returns fixed capacity unit values (`AccountMaxReadCapacityUnits`: 80000, `AccountMaxWriteCapacityUnits`: 80000, `TableMaxReadCapacityUnits`: 40000, `TableMaxWriteCapacityUnits`: 40000). `DescribeEndpoints` returns a single endpoint pointing at `localhost:5566`.
 :::
+
+### Streams
+
+| Operation            | Supported |
+| -------------------- | :-------: |
+| `ListStreams`         |     ✓     |
+| `DescribeStream`     |     ✓     |
+| `GetShardIterator`   |     ✓     |
+| `GetRecords`         |     ✓     |
+
+:::note
+DynamoDB Streams records `INSERT`, `MODIFY`, and `REMOVE` events for all tables. `StreamViewType` is honoured (`KEYS_ONLY`, `NEW_IMAGE`, `OLD_IMAGE`, `NEW_AND_OLD_IMAGES`). Shard iterators expire after 15 minutes of inactivity, matching real AWS behaviour.
+:::
+
+### PartiQL
+
+| Operation                | Supported |
+| ------------------------ | :-------: |
+| `ExecuteStatement`       |     ✓     |
+| `BatchExecuteStatement`  |     ✓     |
+| `ExecuteTransaction`     |     ✓     |
 
 ### Continuous backups (PITR)
 

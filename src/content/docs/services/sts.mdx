@@ -9,10 +9,11 @@ kumolo implements a subset of the STS REST API. All operations accept standard A
 
 ## Support levels
 
-| Symbol | Meaning                                               |
-| :----: | ----------------------------------------------------- |
-|   ✓    | Fully implemented — the feature behaves like real AWS |
-|   —    | Not yet implemented                                   |
+| Symbol | Meaning                                                                                   |
+| :----: | ----------------------------------------------------------------------------------------- |
+|   ✓    | Fully implemented — the feature behaves like real AWS                                     |
+|   ◐    | Partial support — the operation works but has known limitations; see the note for details |
+|   —    | Not yet implemented                                                                       |
 
 ## Operation support
 
@@ -20,9 +21,9 @@ Operations sourced from [`internal/sts/handler.go`](https://github.com/optiflowi
 
 | Operation                    | Supported |
 | ---------------------------- | :-------: |
-| `GetCallerIdentity`          |     ✓     |
-| `AssumeRole`                 |     ✓     |
-| `GetSessionToken`            |     ✓     |
+| `GetCallerIdentity`          |     ◐     |
+| `AssumeRole`                 |     ◐     |
+| `GetSessionToken`            |     ◐     |
 | `AssumeRoleWithWebIdentity`  |     —     |
 | `AssumeRoleWithSAML`         |     —     |
 | `GetFederationToken`         |     —     |

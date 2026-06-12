@@ -136,7 +136,7 @@ the AWS SDK requires one to be present.
         o.UsePathStyle = true
     })
 
-    // DynamoDB and STS only need BaseEndpoint
+    // all other services only need BaseEndpoint
     ddbClient := dynamodb.NewFromConfig(cfg, func(o *dynamodb.Options) {
         o.BaseEndpoint = aws.String("http://localhost:5566")
     })

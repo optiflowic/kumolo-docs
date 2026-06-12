@@ -31,8 +31,9 @@ Operations sourced from [`internal/sts/handler.go`](https://github.com/optiflowi
 | `GetAccessKeyInfo`           |     —     |
 
 :::note
-All supported operations return **fixed values** — no role ARN, duration, or policy validation is performed.
-The returned credentials do not expire and are accepted by kumolo regardless of the values passed in the request.
+Returned credentials are **fixed values** regardless of the role or duration requested.
+`AssumeRole` validates `RoleArn` (length 20–2048) and `RoleSessionName` (length 2–64, pattern `[\w+=,.@-]*`) and returns `ValidationError` for invalid inputs.
+`DurationSeconds` is not validated; returned credentials use a fixed far-future expiration (`2099-01-01T00:00:00Z`).
 
 **`GetCallerIdentity`**
 
@@ -44,14 +45,14 @@ The returned credentials do not expire and are accepted by kumolo regardless of 
 
 **`AssumeRole`**
 
-| Field                           | Fixed value                                                  |
-| ------------------------------- | ------------------------------------------------------------ |
-| `AssumedRoleUser.Arn`           | `arn:aws:sts::000000000000:assumed-role/kumolo-role/session` |
-| `AssumedRoleUser.AssumedRoleId` | `AROAIOSFODNN7EXAMPLE:session`                               |
-| `Credentials.AccessKeyId`       | `AKIAIOSFODNN7EXAMPLE`                                       |
-| `Credentials.SecretAccessKey`   | `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY`                   |
-| `Credentials.SessionToken`      | `AQoDYXdzEJr`                                                |
-| `Credentials.Expiration`        | `2099-01-01T00:00:00Z`                                       |
+| Field                           | Value                                        |
+| ------------------------------- | -------------------------------------------- |
+| `AssumedRoleUser.Arn`           | derived from `RoleArn` and `RoleSessionName` |
+| `AssumedRoleUser.AssumedRoleId` | derived from `RoleSessionName`               |
+| `Credentials.AccessKeyId`       | `AKIAIOSFODNN7EXAMPLE`                       |
+| `Credentials.SecretAccessKey`   | `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY`   |
+| `Credentials.SessionToken`      | `AQoDYXdzEJr`                                |
+| `Credentials.Expiration`        | `2099-01-01T00:00:00Z`                       |
 
 **`GetSessionToken`**
 

@@ -33,7 +33,7 @@ Operations sourced from [`internal/sts/handler.go`](https://github.com/optiflowi
 :::note
 Returned credentials are **fixed values** regardless of the role or duration requested.
 `AssumeRole` validates `RoleArn` (length 20–2048) and `RoleSessionName` (length 2–64, pattern `[\w+=,.@-]*`) and returns `ValidationError` for invalid inputs.
-`DurationSeconds` is not validated; the returned credentials never expire (`2099-01-01T00:00:00Z`).
+`DurationSeconds` is not validated; returned credentials use a fixed far-future expiration (`2099-01-01T00:00:00Z`).
 
 **`GetCallerIdentity`**
 

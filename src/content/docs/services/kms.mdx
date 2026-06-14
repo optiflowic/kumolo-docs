@@ -81,6 +81,8 @@ Automatic key rotation is not executed on a background schedule — kumolo store
 | `GenerateDataKeyPairWithoutPlaintext` |     ◐     |
 
 :::note
+`CreateKey` rejects `ECC_SECG_P256K1` with `UnsupportedOperationException`.
+
 `GenerateDataKeyPair` and `GenerateDataKeyPairWithoutPlaintext`: `ECC_SECG_P256K1` and `SM2` key specs are not supported and return `UnsupportedOperationException`. All RSA and other ECC specs are fully supported. `ReEncrypt` between two asymmetric keys is not supported and returns `InvalidKeyUsageException`; symmetric-to-symmetric and symmetric-to-asymmetric re-encryption work correctly.
 :::
 

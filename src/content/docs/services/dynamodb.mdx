@@ -75,6 +75,8 @@ Parallel scan: `Segment` and `TotalSegments` are validated but the keyspace is n
 | `ListTagsOfResource` |     ◐     |
 
 :::note
+`TagResource` and `UntagResource` accept both table ARNs and index ARNs (GSI/LSI). Tag limits are enforced: 50 tags per resource, key length 1–128 characters, value length 0–256 characters.
+
 `ListTagsOfResource` pagination is not implemented — `NextToken` is accepted but ignored and all tags are returned in a single response.
 :::
 

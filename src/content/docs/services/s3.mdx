@@ -58,12 +58,12 @@ Operations sourced from [`internal/s3/router.go`](https://github.com/optiflowic/
 
 | Operation            | Supported |
 | -------------------- | :-------: |
-| `ListObjects`        |     ◐     |
-| `ListObjectsV2`      |     ◐     |
+| `ListObjects`        |     ✓     |
+| `ListObjectsV2`      |     ✓     |
 | `ListObjectVersions` |     ◐     |
 
 :::note
-`encoding-type=url` is not implemented for `ListObjects` and `ListObjectsV2` — keys containing special characters are returned as-is. For `ListObjectVersions`, `version-id-marker` (tiebreaking within the same key) is not implemented; only `key-marker` is supported.
+`ListObjectVersions`: `version-id-marker` (tiebreaking within the same key) is not implemented; only `key-marker` is supported.
 :::
 
 ### Multipart upload

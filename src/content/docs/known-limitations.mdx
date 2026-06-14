@@ -5,6 +5,29 @@ description: Behaviors in kumolo that differ from real AWS by design or as a kno
 
 kumolo aims for high fidelity, but some behaviors differ from real AWS by design or as a known gap.
 
+## DynamoDB
+
+**`ConsumedCapacity` values are not computed**
+
+`ReturnConsumedCapacity` is fully supported and `ConsumedCapacity` is included in responses when set to `TOTAL` or `INDEXES`.
+However, kumolo always returns `CapacityUnits: 1.0` — actual RCU/WCU are not calculated.
+
+**Number precision is limited to float64**
+
+DynamoDB number attributes are internally stored and compared using `float64`.
+Values with more than 15 significant digits may not sort or compare correctly.
+Real AWS DynamoDB uses arbitrary-precision decimal arithmetic.
+
+## KMS
+
+**Grant-based access control is not enforced**
+
+`CreateGrant`, `ListGrants`, `RevokeGrant`, `RetireGrant`, and `ListRetirableGrants` are fully implemented. However, kumolo does not restrict KMS operations based on a grant's `Operations` list or `Constraints` — all operations succeed regardless of whether a grant authorises them.
+
+**Automatic key rotation does not run on a schedule**
+
+`EnableKeyRotation` stores the rotation configuration and `GetKeyRotationStatus` returns it correctly. However, kumolo does not rotate keys automatically at the configured interval. Use `RotateKeyOnDemand` to trigger a rotation in tests.
+
 ## S3
 
 **Bucket Policy is not enforced**
@@ -29,29 +52,6 @@ This is intentional for local development — you do not need to manage real cre
 **Logging: one log object per request**
 
 Access logs are written to the target bucket, but each request produces exactly one log object. Real AWS batches multiple access log records into a single file. Fields not tracked by kumolo (`bucket-owner`, `request-id`, `object-size`, etc.) are emitted as `-`.
-
-## DynamoDB
-
-**`ConsumedCapacity` values are not computed**
-
-`ReturnConsumedCapacity` is fully supported and `ConsumedCapacity` is included in responses when set to `TOTAL` or `INDEXES`.
-However, kumolo always returns `CapacityUnits: 1.0` — actual RCU/WCU are not calculated.
-
-**Number precision is limited to float64**
-
-DynamoDB number attributes are internally stored and compared using `float64`.
-Values with more than 15 significant digits may not sort or compare correctly.
-Real AWS DynamoDB uses arbitrary-precision decimal arithmetic.
-
-## KMS
-
-**Grant-based access control is not enforced**
-
-`CreateGrant`, `ListGrants`, `RevokeGrant`, `RetireGrant`, and `ListRetirableGrants` are fully implemented. However, kumolo does not restrict KMS operations based on a grant's `Operations` list or `Constraints` — all operations succeed regardless of whether a grant authorises them.
-
-**Automatic key rotation does not run on a schedule**
-
-`EnableKeyRotation` stores the rotation configuration and `GetKeyRotationStatus` returns it correctly. However, kumolo does not rotate keys automatically at the configured interval. Use `RotateKeyOnDemand` to trigger a rotation in tests.
 
 ## STS
 

@@ -45,9 +45,13 @@ kumolo parses SigV4 headers and presigned URL parameters to extract request meta
 Any non-empty `aws_access_key_id` / `aws_secret_access_key` pair is accepted.
 This is intentional for local development — you do not need to manage real credentials.
 
+**Presigned POST: policy conditions are not evaluated**
+
+For browser-based uploads via `POST Object`, kumolo stores and returns the POST policy but does not evaluate its conditions (`content-length-range`, key prefix constraints, expiration, etc.). Any conforming form submission is accepted regardless of policy content.
+
 **Replication: same-instance only**
 
-`PutBucketReplication` is accepted and replication runs synchronously within the same kumolo instance. Cross-instance and real-AWS destinations are not supported. Delete marker replication is not implemented. Tag-based filter rules in replication configurations are ignored — only key prefix matching is applied.
+`PutBucketReplication` is accepted and replication runs synchronously within the same kumolo instance. Cross-instance and real-AWS destinations are not supported.
 
 **Logging: one log object per request**
 

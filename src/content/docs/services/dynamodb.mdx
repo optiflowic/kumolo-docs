@@ -101,7 +101,7 @@ Parallel scan: `Segment` and `TotalSegments` are validated but the keyspace is n
 | `GetRecords`       |     ✓     |
 
 :::note
-DynamoDB Streams records `INSERT`, `MODIFY`, and `REMOVE` events for all tables. `StreamViewType` is honoured (`KEYS_ONLY`, `NEW_IMAGE`, `OLD_IMAGE`, `NEW_AND_OLD_IMAGES`). Shard iterators expire after 15 minutes of inactivity, matching real AWS behaviour.
+DynamoDB Streams records `INSERT`, `MODIFY`, and `REMOVE` events for all tables. `StreamViewType` is honoured (`KEYS_ONLY`, `NEW_IMAGE`, `OLD_IMAGE`, `NEW_AND_OLD_IMAGES`). Shard iterators expire after 15 minutes of inactivity, matching real AWS behaviour. Stream records are persisted to disk and survive process restarts — unread records remain available after kumolo is restarted.
 :::
 
 ### PartiQL

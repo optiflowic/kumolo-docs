@@ -26,36 +26,44 @@ Operations sourced from [`internal/cognito/router.go`](https://github.com/optifl
 
 | Operation              | Supported |
 | ---------------------- | :-------: |
-| `CreateUserPool`       |     ✓     |
+| `CreateUserPool`       |     ◐     |
 | `DescribeUserPool`     |     ✓     |
-| `UpdateUserPool`       |     ✓     |
+| `UpdateUserPool`       |     ◐     |
 | `DeleteUserPool`       |     ✓     |
 | `ListUserPools`        |     ✓     |
-| `GetUserPoolMfaConfig` |     ✓     |
+| `GetUserPoolMfaConfig` |     ◐     |
 
 :::note
-`GetUserPoolMfaConfig` returns the MFA configuration stored on the pool. MFA is not enforced during auth flows in kumolo.
+Password policy enforcement: only minimum length (8 characters) is checked. Complexity rules (`RequireUppercase`, `RequireLowercase`, `RequireNumbers`, `RequireSymbols`) are accepted and stored but not enforced.
+
+`DeletionProtection` is accepted and stored but not enforced — pools can always be deleted in kumolo for test ergonomics.
+
+`GetUserPoolMfaConfig`: `SoftwareTokenMfaConfiguration.Enabled` is always returned as `false` (TOTP is not supported). MFA is not enforced in any auth flow.
 :::
 
 ### User pool client management
 
 | Operation                | Supported |
 | ------------------------ | :-------: |
-| `CreateUserPoolClient`   |     ✓     |
+| `CreateUserPoolClient`   |     ◐     |
 | `DescribeUserPoolClient` |     ✓     |
-| `UpdateUserPoolClient`   |     ✓     |
+| `UpdateUserPoolClient`   |     ◐     |
 | `DeleteUserPoolClient`   |     ✓     |
 | `ListUserPoolClients`    |     ✓     |
+
+:::note
+Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleared rather than defaulted to AWS defaults. `ClientSecret` is generated if `GenerateSecret: true` but is not validated on any auth request.
+:::
 
 ### Authentication flows
 
 | Operation                | Supported |
 | ------------------------ | :-------: |
-| `SignUp`                 |     ✓     |
+| `SignUp`                 |     ◐     |
 | `ConfirmSignUp`          |     ✓     |
-| `ResendConfirmationCode` |     ✓     |
-| `InitiateAuth`           |     ✓     |
-| `RespondToAuthChallenge` |     ✓     |
+| `ResendConfirmationCode` |     ◐     |
+| `InitiateAuth`           |     ◐     |
+| `RespondToAuthChallenge` |     ◐     |
 | `RevokeToken`            |     ✓     |
 | `GlobalSignOut`          |     ✓     |
 
@@ -67,7 +75,13 @@ Operations sourced from [`internal/cognito/router.go`](https://github.com/optifl
 `RespondToAuthChallenge` supports the `NEW_PASSWORD_REQUIRED` challenge.
 
 :::note
-Confirmation codes issued by `SignUp` and `ResendConfirmationCode` are logged to the kumolo server log rather than sent via email or SMS. Retrieve the code from the log to confirm sign-up in tests.
+**Confirmation codes**: codes issued by `SignUp` and `ResendConfirmationCode` are written to the kumolo server log instead of being sent via email or SMS. Use `AdminConfirmSignUp` in tests to skip code retrieval entirely.
+
+**Token expiry**: `ExpiresIn` (3600 s) is returned but not enforced. `TokenValidityUnits` is stored but not checked — `RefreshTokenValidity` is always interpreted as days.
+
+**`SecretHash`, `ClientMetadata`, `AnalyticsMetadata`, `UserContextData`**: accepted on all auth operations but ignored. Lambda triggers are not supported.
+
+**`RespondToAuthChallenge`**: `USERNAME` is optional in kumolo (taken from the session JWT when omitted); on real AWS it is required.
 :::
 
 ### Authenticated user operations
@@ -80,11 +94,17 @@ Confirmation codes issued by `SignUp` and `ResendConfirmationCode` are logged to
 
 | Operation              | Supported |
 | ---------------------- | :-------: |
-| `AdminCreateUser`      |     ✓     |
+| `AdminCreateUser`      |     ◐     |
 | `AdminGetUser`         |     ✓     |
-| `AdminSetUserPassword` |     ✓     |
+| `AdminSetUserPassword` |     ◐     |
 | `AdminConfirmSignUp`   |     ✓     |
 | `AdminDeleteUser`      |     ✓     |
+
+:::note
+`AdminCreateUser`: password complexity rules are not enforced (only minimum length is checked). `ForceAliasCreation` and `DesiredDeliveryMediums` are accepted but ignored — no invitation messages are sent.
+
+`AdminSetUserPassword`: password complexity rules are not enforced. Password history policy (`PasswordHistoryPolicyViolationException`) is not applied.
+:::
 
 ### Group management
 

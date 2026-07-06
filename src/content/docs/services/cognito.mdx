@@ -154,6 +154,7 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 | `AdminUpdateAuthEventFeedback`    |     —     |
 | `AdminDisableProviderForUser`     |     —     |
 | `AdminLinkProviderForUser`        |     —     |
+| `ListUsers`                       |     —     |
 
 :::note
 `AdminCreateUser`: password complexity rules are not enforced (only minimum length is checked). `ForceAliasCreation` and `DesiredDeliveryMediums` are accepted but ignored — no invitation messages are sent.
@@ -170,7 +171,6 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 | `UpdateGroup`               |     ✓     |
 | `DeleteGroup`               |     ✓     |
 | `ListGroups`                |     ✓     |
-| `ListUsers`                 |     —     |
 | `ListUsersInGroup`          |     ✓     |
 | `AdminAddUserToGroup`       |     ✓     |
 | `AdminRemoveUserFromGroup`  |     ✓     |

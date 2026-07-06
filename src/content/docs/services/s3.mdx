@@ -29,6 +29,7 @@ Operations sourced from [`internal/s3/router.go`](https://github.com/optiflowic/
 | `ListBuckets`          |     ◐     |
 | `ListDirectoryBuckets` |     —     |
 | `CreateSession`        |     —     |
+| `RenameObject`         |     —     |
 
 :::note
 `ListBuckets` pagination (`max-buckets`, `continuation-token`) is not implemented — all buckets are returned in a single response. `prefix` and `bucket-region` filters are ignored.
@@ -47,8 +48,18 @@ Operations sourced from [`internal/s3/router.go`](https://github.com/optiflowic/
 | `GetObjectAttributes`    |     ✓     |
 | `RestoreObject`          |     ◐     |
 | `SelectObjectContent`    |     ◐     |
+| `UpdateObjectEncryption` |     —     |
 | `GetObjectTorrent`       |     —     |
 | `WriteGetObjectResponse` |     —     |
+
+### Object annotations
+
+| Operation               | Supported |
+| ----------------------- | :-------: |
+| `GetObjectAnnotation`   |     —     |
+| `PutObjectAnnotation`   |     —     |
+| `DeleteObjectAnnotation`|     —     |
+| `ListObjectAnnotations` |     —     |
 
 :::note
 `SelectObjectContent` supports CSV and JSON input with CSV and JSON output. Parquet input is not supported and returns an error. `RestoreObject` does not support the `versionId` query parameter; only the current version can be restored.
@@ -275,6 +286,27 @@ Access logs are written to the configured target bucket in S3 server access log 
 | ------------------------- | :-------: |
 | `GetBucketRequestPayment` |     ◐     |
 | `PutBucketRequestPayment` |     ◐     |
+
+### ABAC
+
+| Operation       | Supported |
+| --------------- | :-------: |
+| `GetBucketAbac` |     —     |
+| `PutBucketAbac` |     —     |
+
+### Metadata table configuration
+
+| Operation                                              | Supported |
+| ------------------------------------------------------ | :-------: |
+| `CreateBucketMetadataTableConfiguration`               |     —     |
+| `GetBucketMetadataTableConfiguration`                  |     —     |
+| `DeleteBucketMetadataTableConfiguration`               |     —     |
+| `CreateBucketMetadataConfiguration`                    |     —     |
+| `GetBucketMetadataConfiguration`                       |     —     |
+| `DeleteBucketMetadataConfiguration`                    |     —     |
+| `UpdateBucketMetadataAnnotationTableConfiguration`     |     —     |
+| `UpdateBucketMetadataInventoryTableConfiguration`      |     —     |
+| `UpdateBucketMetadataJournalTableConfiguration`        |     —     |
 
 ### Analytics
 

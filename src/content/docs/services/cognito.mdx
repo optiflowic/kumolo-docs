@@ -24,14 +24,19 @@ Operations sourced from [`internal/cognito/router.go`](https://github.com/optifl
 
 ### User pool management
 
-| Operation              | Supported |
-| ---------------------- | :-------: |
-| `CreateUserPool`       |     ◐     |
-| `DescribeUserPool`     |     ✓     |
-| `UpdateUserPool`       |     ◐     |
-| `DeleteUserPool`       |     ✓     |
-| `ListUserPools`        |     ✓     |
-| `GetUserPoolMfaConfig` |     ◐     |
+| Operation                      | Supported |
+| ------------------------------ | :-------: |
+| `CreateUserPool`               |     ◐     |
+| `DescribeUserPool`             |     ✓     |
+| `UpdateUserPool`               |     ◐     |
+| `DeleteUserPool`               |     ✓     |
+| `ListUserPools`                |     ✓     |
+| `GetUserPoolMfaConfig`         |     ◐     |
+| `SetUserPoolMfaConfig`         |     —     |
+| `AddCustomAttributes`          |     —     |
+| `GetLogDeliveryConfiguration`  |     —     |
+| `SetLogDeliveryConfiguration`  |     —     |
+| `GetSigningCertificate`        |     —     |
 
 :::note
 Password policy enforcement: only minimum length (8 characters) is checked. Complexity rules (`RequireUppercase`, `RequireLowercase`, `RequireNumbers`, `RequireSymbols`) are accepted and stored but not enforced.
@@ -41,31 +46,59 @@ Password policy enforcement: only minimum length (8 characters) is checked. Comp
 `GetUserPoolMfaConfig`: `SoftwareTokenMfaConfiguration.Enabled` is always returned as `false` (TOTP is not supported). MFA is not enforced in any auth flow.
 :::
 
-### User pool client management
+### User pool domains
 
 | Operation                | Supported |
 | ------------------------ | :-------: |
-| `CreateUserPoolClient`   |     ◐     |
-| `DescribeUserPoolClient` |     ✓     |
-| `UpdateUserPoolClient`   |     ◐     |
-| `DeleteUserPoolClient`   |     ✓     |
-| `ListUserPoolClients`    |     ✓     |
+| `CreateUserPoolDomain`   |     —     |
+| `UpdateUserPoolDomain`   |     —     |
+| `DeleteUserPoolDomain`   |     —     |
+| `DescribeUserPoolDomain` |     —     |
+
+### User pool replicas
+
+| Operation               | Supported |
+| ----------------------- | :-------: |
+| `CreateUserPoolReplica` |     —     |
+| `UpdateUserPoolReplica` |     —     |
+| `DeleteUserPoolReplica` |     —     |
+| `ListUserPoolReplicas`  |     —     |
+
+### User pool clients
+
+| Operation                    | Supported |
+| ---------------------------- | :-------: |
+| `CreateUserPoolClient`       |     ◐     |
+| `DescribeUserPoolClient`     |     ✓     |
+| `UpdateUserPoolClient`       |     ◐     |
+| `DeleteUserPoolClient`       |     ✓     |
+| `ListUserPoolClients`        |     ✓     |
+| `AddUserPoolClientSecret`    |     —     |
+| `DeleteUserPoolClientSecret` |     —     |
+| `ListUserPoolClientSecrets`  |     —     |
 
 :::note
 Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleared rather than defaulted to AWS defaults. `ClientSecret` is generated if `GenerateSecret: true` but is not validated on any auth request.
 :::
 
-### Authentication flows
+### Authentication
 
-| Operation                | Supported |
-| ------------------------ | :-------: |
-| `SignUp`                 |     ◐     |
-| `ConfirmSignUp`          |     ✓     |
-| `ResendConfirmationCode` |     ◐     |
-| `InitiateAuth`           |     ◐     |
-| `RespondToAuthChallenge` |     ◐     |
-| `RevokeToken`            |     ✓     |
-| `GlobalSignOut`          |     ✓     |
+| Operation                  | Supported |
+| -------------------------- | :-------: |
+| `SignUp`                   |     ◐     |
+| `ConfirmSignUp`            |     ✓     |
+| `ResendConfirmationCode`   |     ◐     |
+| `InitiateAuth`             |     ◐     |
+| `RespondToAuthChallenge`   |     ◐     |
+| `AdminInitiateAuth`        |     —     |
+| `AdminRespondToAuthChallenge` |     —  |
+| `ForgotPassword`           |     —     |
+| `ConfirmForgotPassword`    |     —     |
+| `ChangePassword`           |     —     |
+| `GetTokensFromRefreshToken`|     —     |
+| `RevokeToken`              |     ✓     |
+| `GlobalSignOut`            |     ✓     |
+| `AdminUserGlobalSignOut`   |     —     |
 
 `InitiateAuth` supports the following auth flows:
 
@@ -84,21 +117,43 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 **`RespondToAuthChallenge`**: `USERNAME` is optional in kumolo (taken from the session JWT when omitted); on real AWS it is required.
 :::
 
-### Authenticated user operations
+### User operations
 
-| Operation | Supported |
-| --------- | :-------: |
-| `GetUser` |     ✓     |
+| Operation                        | Supported |
+| -------------------------------- | :-------: |
+| `GetUser`                        |     ✓     |
+| `UpdateUserAttributes`           |     —     |
+| `DeleteUserAttributes`           |     —     |
+| `DeleteUser`                     |     —     |
+| `GetUserAttributeVerificationCode` |     —   |
+| `VerifyUserAttribute`            |     —     |
+| `GetUserAuthFactors`             |     —     |
+| `SetUserMFAPreference`           |     —     |
+| `SetUserSettings`                |     —     |
+| `GetUICustomization`             |     —     |
+| `SetUICustomization`             |     —     |
+| `UpdateAuthEventFeedback`        |     —     |
 
 ### Admin operations
 
-| Operation              | Supported |
-| ---------------------- | :-------: |
-| `AdminCreateUser`      |     ◐     |
-| `AdminGetUser`         |     ✓     |
-| `AdminSetUserPassword` |     ◐     |
-| `AdminConfirmSignUp`   |     ✓     |
-| `AdminDeleteUser`      |     ✓     |
+| Operation                         | Supported |
+| --------------------------------- | :-------: |
+| `AdminCreateUser`                 |     ◐     |
+| `AdminGetUser`                    |     ✓     |
+| `AdminSetUserPassword`            |     ◐     |
+| `AdminConfirmSignUp`              |     ✓     |
+| `AdminDeleteUser`                 |     ✓     |
+| `AdminDisableUser`                |     —     |
+| `AdminEnableUser`                 |     —     |
+| `AdminUpdateUserAttributes`       |     —     |
+| `AdminDeleteUserAttributes`       |     —     |
+| `AdminResetUserPassword`          |     —     |
+| `AdminSetUserMFAPreference`       |     —     |
+| `AdminSetUserSettings`            |     —     |
+| `AdminListUserAuthEvents`         |     —     |
+| `AdminUpdateAuthEventFeedback`    |     —     |
+| `AdminDisableProviderForUser`     |     —     |
+| `AdminLinkProviderForUser`        |     —     |
 
 :::note
 `AdminCreateUser`: password complexity rules are not enforced (only minimum length is checked). `ForceAliasCreation` and `DesiredDeliveryMediums` are accepted but ignored — no invitation messages are sent.
@@ -108,17 +163,110 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 
 ### Group management
 
-| Operation                 | Supported |
-| ------------------------- | :-------: |
-| `CreateGroup`             |     ✓     |
-| `GetGroup`                |     ✓     |
-| `UpdateGroup`             |     ✓     |
-| `DeleteGroup`             |     ✓     |
-| `ListGroups`              |     ✓     |
-| `AdminAddUserToGroup`     |     ✓     |
-| `AdminRemoveUserFromGroup`|     ✓     |
-| `AdminListGroupsForUser`  |     ✓     |
-| `ListUsersInGroup`        |     ✓     |
+| Operation                   | Supported |
+| --------------------------- | :-------: |
+| `CreateGroup`               |     ✓     |
+| `GetGroup`                  |     ✓     |
+| `UpdateGroup`               |     ✓     |
+| `DeleteGroup`               |     ✓     |
+| `ListGroups`                |     ✓     |
+| `ListUsers`                 |     —     |
+| `ListUsersInGroup`          |     ✓     |
+| `AdminAddUserToGroup`       |     ✓     |
+| `AdminRemoveUserFromGroup`  |     ✓     |
+| `AdminListGroupsForUser`    |     ✓     |
+
+### Device management
+
+| Operation              | Supported |
+| ---------------------- | :-------: |
+| `ConfirmDevice`        |     —     |
+| `ForgetDevice`         |     —     |
+| `GetDevice`            |     —     |
+| `ListDevices`          |     —     |
+| `UpdateDeviceStatus`   |     —     |
+| `AdminForgetDevice`    |     —     |
+| `AdminGetDevice`       |     —     |
+| `AdminListDevices`     |     —     |
+| `AdminUpdateDeviceStatus` |     —  |
+
+### MFA & WebAuthn
+
+| Operation                      | Supported |
+| ------------------------------ | :-------: |
+| `AssociateSoftwareToken`       |     —     |
+| `VerifySoftwareToken`          |     —     |
+| `StartWebAuthnRegistration`    |     —     |
+| `CompleteWebAuthnRegistration` |     —     |
+| `DeleteWebAuthnCredential`     |     —     |
+| `ListWebAuthnCredentials`      |     —     |
+
+### Identity providers
+
+| Operation                       | Supported |
+| ------------------------------- | :-------: |
+| `CreateIdentityProvider`        |     —     |
+| `DescribeIdentityProvider`      |     —     |
+| `UpdateIdentityProvider`        |     —     |
+| `DeleteIdentityProvider`        |     —     |
+| `ListIdentityProviders`         |     —     |
+| `GetIdentityProviderByIdentifier` |     —   |
+
+### Resource servers
+
+| Operation               | Supported |
+| ----------------------- | :-------: |
+| `CreateResourceServer`  |     —     |
+| `DescribeResourceServer`|     —     |
+| `UpdateResourceServer`  |     —     |
+| `DeleteResourceServer`  |     —     |
+| `ListResourceServers`   |     —     |
+
+### User import
+
+| Operation              | Supported |
+| ---------------------- | :-------: |
+| `GetCSVHeader`         |     —     |
+| `CreateUserImportJob`  |     —     |
+| `DescribeUserImportJob`|     —     |
+| `StartUserImportJob`   |     —     |
+| `StopUserImportJob`    |     —     |
+| `ListUserImportJobs`   |     —     |
+
+### Risk configuration
+
+| Operation                  | Supported |
+| -------------------------- | :-------: |
+| `DescribeRiskConfiguration`|     —     |
+| `SetRiskConfiguration`     |     —     |
+
+### Managed login branding
+
+| Operation                             | Supported |
+| ------------------------------------- | :-------: |
+| `CreateManagedLoginBranding`          |     —     |
+| `DescribeManagedLoginBranding`        |     —     |
+| `DescribeManagedLoginBrandingByClient`|     —     |
+| `UpdateManagedLoginBranding`          |     —     |
+| `DeleteManagedLoginBranding`          |     —     |
+
+### Terms
+
+| Operation       | Supported |
+| --------------- | :-------: |
+| `CreateTerms`   |     —     |
+| `DescribeTerms` |     —     |
+| `ListTerms`     |     —     |
+| `UpdateTerms`   |     —     |
+| `DeleteTerms`   |     —     |
+
+### Tagging
+
+| Operation            | Supported |
+| -------------------- | :-------: |
+| `TagResource`        |     —     |
+| `UntagResource`      |     —     |
+| `ListTagsForResource`|     —     |
 
 ## Quick start
 

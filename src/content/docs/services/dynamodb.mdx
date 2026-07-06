@@ -130,6 +130,7 @@ Point-in-time recovery (PITR) can be enabled or disabled and the setting is pers
 | `DescribeKinesisStreamingDestination` |     ◐     |
 | `EnableKinesisStreamingDestination`   |     ◐     |
 | `DisableKinesisStreamingDestination`  |     ◐     |
+| `UpdateKinesisStreamingDestination`   |     —     |
 
 :::note
 Kinesis destination configuration is persisted and returned. No data is forwarded to an actual Kinesis stream.
@@ -141,6 +142,7 @@ Kinesis destination configuration is persisted and returned. No data is forwarde
 | --------------------------------- | :-------: |
 | `CreateGlobalTable`               |     —     |
 | `DescribeGlobalTable`             |     —     |
+| `DescribeGlobalTableSettings`     |     —     |
 | `ListGlobalTables`                |     —     |
 | `UpdateGlobalTable`               |     —     |
 | `UpdateGlobalTableSettings`       |     —     |
@@ -149,18 +151,28 @@ Kinesis destination configuration is persisted and returned. No data is forwarde
 
 ### Backups
 
-| Operation                  | Supported |
-| -------------------------- | :-------: |
-| `CreateBackup`             |     —     |
-| `DeleteBackup`             |     —     |
-| `DescribeBackup`           |     —     |
-| `ListBackups`              |     —     |
-| `ExportTableToPointInTime` |     —     |
-| `ListExports`              |     —     |
-| `DescribeExport`           |     —     |
-| `ImportTable`              |     —     |
-| `ListImports`              |     —     |
-| `DescribeImport`           |     —     |
+| Operation                    | Supported |
+| ---------------------------- | :-------: |
+| `CreateBackup`               |     —     |
+| `DeleteBackup`               |     —     |
+| `DescribeBackup`             |     —     |
+| `ListBackups`                |     —     |
+| `RestoreTableFromBackup`     |     —     |
+| `RestoreTableToPointInTime`  |     —     |
+| `ExportTableToPointInTime`   |     —     |
+| `ListExports`                |     —     |
+| `DescribeExport`             |     —     |
+| `ImportTable`                |     —     |
+| `ListImports`                |     —     |
+| `DescribeImport`             |     —     |
+
+### Resource policy
+
+| Operation              | Supported |
+| ---------------------- | :-------: |
+| `GetResourcePolicy`    |     —     |
+| `PutResourcePolicy`    |     —     |
+| `DeleteResourcePolicy` |     —     |
 
 ### Contributor insights
 

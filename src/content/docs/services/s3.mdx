@@ -29,7 +29,6 @@ Operations sourced from [`internal/s3/router.go`](https://github.com/optiflowic/
 | `ListBuckets`          |     ◐     |
 | `ListDirectoryBuckets` |     —     |
 | `CreateSession`        |     —     |
-| `RenameObject`         |     —     |
 
 :::note
 `ListBuckets` pagination (`max-buckets`, `continuation-token`) is not implemented — all buckets are returned in a single response. `prefix` and `bucket-region` filters are ignored.
@@ -48,6 +47,7 @@ Operations sourced from [`internal/s3/router.go`](https://github.com/optiflowic/
 | `GetObjectAttributes`    |     ✓     |
 | `RestoreObject`          |     ◐     |
 | `SelectObjectContent`    |     ◐     |
+| `RenameObject`           |     —     |
 | `UpdateObjectEncryption` |     —     |
 | `GetObjectTorrent`       |     —     |
 | `WriteGetObjectResponse` |     —     |

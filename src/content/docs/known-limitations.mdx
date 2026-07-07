@@ -57,6 +57,24 @@ For browser-based uploads via `POST Object`, kumolo stores and returns the POST 
 
 Access logs are written to the target bucket, but each request produces exactly one log object. Real AWS batches multiple access log records into a single file. Fields not tracked by kumolo (`bucket-owner`, `request-id`, `object-size`, etc.) are emitted as `-`.
 
+## Cognito
+
+**Lambda triggers are not executed**
+
+`PreSignUp`, `PostConfirmation`, `PreAuthentication`, `PostAuthentication`, and all other Lambda trigger hooks are silently ignored. Workflows that rely on triggers to block sign-ups, enrich tokens, or send custom messages will behave differently in kumolo.
+
+**Token expiry is not enforced**
+
+`ExpiresIn` (3600 s) is returned in auth responses but tokens are accepted indefinitely. `TokenValidityUnits` and `RefreshTokenValidity` are stored but not evaluated — refresh tokens do not expire.
+
+**MFA is not enforced**
+
+MFA configuration is accepted and stored, but kumolo does not require a second factor in any auth flow. All auth challenges complete without MFA regardless of pool settings.
+
+**Confirmation codes are written to the server log**
+
+`SignUp` and `ResendConfirmationCode` write the confirmation code to the kumolo server log instead of sending it via email or SMS. In tests, use `AdminConfirmSignUp` to skip code retrieval entirely.
+
 ## STS
 
 **`AssumeRole` does not simulate distinct roles**

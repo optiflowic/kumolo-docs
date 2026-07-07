@@ -8,7 +8,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 kumolo implements the Cognito User Pools REST API. All operations accept standard AWS SDK v2 requests — point your client at `http://localhost:5566`.
 Unlike S3, `UsePathStyle` is not required; only `BaseEndpoint` needs to be overridden on the client.
 
-A JWKS endpoint is available at `http://localhost:5566/{region}/{userPoolId}/.well-known/jwks.json` for JWT verification.
+A JWKS endpoint is available at `http://localhost:5566/{userPoolId}/.well-known/jwks.json` for JWT verification.
 
 ## Support levels
 
@@ -154,13 +154,18 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 | `AdminUpdateAuthEventFeedback` |     —     |
 | `AdminDisableProviderForUser`  |     —     |
 | `AdminLinkProviderForUser`     |     —     |
-| `ListUsers`                    |     —     |
 
 :::note
 `AdminCreateUser`: password complexity rules are not enforced (only minimum length is checked). `ForceAliasCreation` and `DesiredDeliveryMediums` are accepted but ignored — no invitation messages are sent.
 
 `AdminSetUserPassword`: password complexity rules are not enforced. Password history policy (`PasswordHistoryPolicyViolationException`) is not applied.
 :::
+
+### User listing
+
+| Operation   | Supported |
+| ----------- | :-------: |
+| `ListUsers` |     —     |
 
 ### Group management
 

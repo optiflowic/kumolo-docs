@@ -268,14 +268,6 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 | `UntagResource`       |     ✓     |
 | `ListTagsForResource` |     ✓     |
 
-:::note
-Maximum 50 tags per user pool. Tag key: 1–128 characters; tag value: 0–256 characters.
-
-`TagResource` merges tags — existing keys are overwritten, unmentioned keys are preserved. `UntagResource` silently ignores keys that do not exist. `ListTagsForResource` has no pagination.
-
-`ResourceArn` is validated for length only (20–2048 characters); the ARN format is not regex-checked.
-:::
-
 ## Quick start
 
 <Tabs>

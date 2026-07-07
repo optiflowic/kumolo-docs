@@ -21,16 +21,16 @@ Operations sourced from [`internal/kms/router.go`](https://github.com/optiflowic
 
 ### Key management
 
-| Operation            | Supported |
-| -------------------- | :-------: |
-| `CreateKey`          |     ✓     |
-| `DescribeKey`        |     ✓     |
-| `ListKeys`           |     ✓     |
-| `GetKeyPolicy`       |     ✓     |
-| `PutKeyPolicy`       |     ✓     |
-| `ListKeyPolicies`    |     —     |
-| `UpdateKeyDescription` |     —   |
-| `GetKeyLastUsage`    |     —     |
+| Operation              | Supported |
+| ---------------------- | :-------: |
+| `CreateKey`            |     ✓     |
+| `DescribeKey`          |     ✓     |
+| `ListKeys`             |     ✓     |
+| `GetKeyPolicy`         |     ✓     |
+| `PutKeyPolicy`         |     ✓     |
+| `ListKeyPolicies`      |     —     |
+| `UpdateKeyDescription` |     —     |
+| `GetKeyLastUsage`      |     —     |
 
 ### Key lifecycle
 
@@ -131,11 +131,11 @@ Grants are stored and listed correctly. Grant-based access control (grantee prin
 
 ### Key import
 
-| Operation                  | Supported |
-| -------------------------- | :-------: |
-| `GetParametersForImport`   |     —     |
-| `ImportKeyMaterial`        |     —     |
-| `DeleteImportedKeyMaterial`|     —     |
+| Operation                   | Supported |
+| --------------------------- | :-------: |
+| `GetParametersForImport`    |     —     |
+| `ImportKeyMaterial`         |     —     |
+| `DeleteImportedKeyMaterial` |     —     |
 
 ### Key agreement
 
@@ -145,13 +145,13 @@ Grants are stored and listed correctly. Grant-based access control (grantee prin
 
 ### Multi-region keys
 
-| Operation            | Supported |
-| -------------------- | :-------: |
-| `ReplicateKey`       |     —     |
-| `UpdatePrimaryRegion`|     —     |
+| Operation             | Supported |
+| --------------------- | :-------: |
+| `ReplicateKey`        |     —     |
+| `UpdatePrimaryRegion` |     —     |
 
 :::note
-`MultiRegion: true` is accepted in `CreateKey` but not replicated — the key is created as a single-region key.
+`MultiRegion: true` is accepted in `CreateKey`, but replicas are not created.
 :::
 
 ### Custom key stores

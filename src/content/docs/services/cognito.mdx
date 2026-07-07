@@ -24,19 +24,19 @@ Operations sourced from [`internal/cognito/router.go`](https://github.com/optifl
 
 ### User pool management
 
-| Operation                      | Supported |
-| ------------------------------ | :-------: |
-| `CreateUserPool`               |     ◐     |
-| `DescribeUserPool`             |     ✓     |
-| `UpdateUserPool`               |     ◐     |
-| `DeleteUserPool`               |     ✓     |
-| `ListUserPools`                |     ✓     |
-| `GetUserPoolMfaConfig`         |     ◐     |
-| `SetUserPoolMfaConfig`         |     —     |
-| `AddCustomAttributes`          |     —     |
-| `GetLogDeliveryConfiguration`  |     —     |
-| `SetLogDeliveryConfiguration`  |     —     |
-| `GetSigningCertificate`        |     —     |
+| Operation                     | Supported |
+| ----------------------------- | :-------: |
+| `CreateUserPool`              |     ◐     |
+| `DescribeUserPool`            |     ✓     |
+| `UpdateUserPool`              |     ◐     |
+| `DeleteUserPool`              |     ✓     |
+| `ListUserPools`               |     ✓     |
+| `GetUserPoolMfaConfig`        |     ◐     |
+| `SetUserPoolMfaConfig`        |     —     |
+| `AddCustomAttributes`         |     —     |
+| `GetLogDeliveryConfiguration` |     —     |
+| `SetLogDeliveryConfiguration` |     —     |
+| `GetSigningCertificate`       |     —     |
 
 :::note
 Password policy enforcement: only minimum length (8 characters) is checked. Complexity rules (`RequireUppercase`, `RequireLowercase`, `RequireNumbers`, `RequireSymbols`) are accepted and stored but not enforced.
@@ -83,22 +83,22 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 
 ### Authentication
 
-| Operation                  | Supported |
-| -------------------------- | :-------: |
-| `SignUp`                   |     ◐     |
-| `ConfirmSignUp`            |     ✓     |
-| `ResendConfirmationCode`   |     ◐     |
-| `InitiateAuth`             |     ◐     |
-| `RespondToAuthChallenge`   |     ◐     |
-| `AdminInitiateAuth`        |     —     |
-| `AdminRespondToAuthChallenge` |     —  |
-| `ForgotPassword`           |     —     |
-| `ConfirmForgotPassword`    |     —     |
-| `ChangePassword`           |     —     |
-| `GetTokensFromRefreshToken`|     —     |
-| `RevokeToken`              |     ✓     |
-| `GlobalSignOut`            |     ✓     |
-| `AdminUserGlobalSignOut`   |     —     |
+| Operation                     | Supported |
+| ----------------------------- | :-------: |
+| `SignUp`                      |     ◐     |
+| `ConfirmSignUp`               |     ✓     |
+| `ResendConfirmationCode`      |     ◐     |
+| `InitiateAuth`                |     ◐     |
+| `RespondToAuthChallenge`      |     ◐     |
+| `AdminInitiateAuth`           |     —     |
+| `AdminRespondToAuthChallenge` |     —     |
+| `ForgotPassword`              |     —     |
+| `ConfirmForgotPassword`       |     —     |
+| `ChangePassword`              |     —     |
+| `GetTokensFromRefreshToken`   |     —     |
+| `RevokeToken`                 |     ✓     |
+| `GlobalSignOut`               |     ✓     |
+| `AdminUserGlobalSignOut`      |     —     |
 
 `InitiateAuth` supports the following auth flows:
 
@@ -119,42 +119,42 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 
 ### User operations
 
-| Operation                        | Supported |
-| -------------------------------- | :-------: |
-| `GetUser`                        |     ✓     |
-| `UpdateUserAttributes`           |     —     |
-| `DeleteUserAttributes`           |     —     |
-| `DeleteUser`                     |     —     |
-| `GetUserAttributeVerificationCode` |     —   |
-| `VerifyUserAttribute`            |     —     |
-| `GetUserAuthFactors`             |     —     |
-| `SetUserMFAPreference`           |     —     |
-| `SetUserSettings`                |     —     |
-| `GetUICustomization`             |     —     |
-| `SetUICustomization`             |     —     |
-| `UpdateAuthEventFeedback`        |     —     |
+| Operation                          | Supported |
+| ---------------------------------- | :-------: |
+| `GetUser`                          |     ✓     |
+| `UpdateUserAttributes`             |     —     |
+| `DeleteUserAttributes`             |     —     |
+| `DeleteUser`                       |     —     |
+| `GetUserAttributeVerificationCode` |     —     |
+| `VerifyUserAttribute`              |     —     |
+| `GetUserAuthFactors`               |     —     |
+| `SetUserMFAPreference`             |     —     |
+| `SetUserSettings`                  |     —     |
+| `GetUICustomization`               |     —     |
+| `SetUICustomization`               |     —     |
+| `UpdateAuthEventFeedback`          |     —     |
 
 ### Admin operations
 
-| Operation                         | Supported |
-| --------------------------------- | :-------: |
-| `AdminCreateUser`                 |     ◐     |
-| `AdminGetUser`                    |     ✓     |
-| `AdminSetUserPassword`            |     ◐     |
-| `AdminConfirmSignUp`              |     ✓     |
-| `AdminDeleteUser`                 |     ✓     |
-| `AdminDisableUser`                |     —     |
-| `AdminEnableUser`                 |     —     |
-| `AdminUpdateUserAttributes`       |     —     |
-| `AdminDeleteUserAttributes`       |     —     |
-| `AdminResetUserPassword`          |     —     |
-| `AdminSetUserMFAPreference`       |     —     |
-| `AdminSetUserSettings`            |     —     |
-| `AdminListUserAuthEvents`         |     —     |
-| `AdminUpdateAuthEventFeedback`    |     —     |
-| `AdminDisableProviderForUser`     |     —     |
-| `AdminLinkProviderForUser`        |     —     |
-| `ListUsers`                       |     —     |
+| Operation                      | Supported |
+| ------------------------------ | :-------: |
+| `AdminCreateUser`              |     ◐     |
+| `AdminGetUser`                 |     ✓     |
+| `AdminSetUserPassword`         |     ◐     |
+| `AdminConfirmSignUp`           |     ✓     |
+| `AdminDeleteUser`              |     ✓     |
+| `AdminDisableUser`             |     —     |
+| `AdminEnableUser`              |     —     |
+| `AdminUpdateUserAttributes`    |     —     |
+| `AdminDeleteUserAttributes`    |     —     |
+| `AdminResetUserPassword`       |     —     |
+| `AdminSetUserMFAPreference`    |     —     |
+| `AdminSetUserSettings`         |     —     |
+| `AdminListUserAuthEvents`      |     —     |
+| `AdminUpdateAuthEventFeedback` |     —     |
+| `AdminDisableProviderForUser`  |     —     |
+| `AdminLinkProviderForUser`     |     —     |
+| `ListUsers`                    |     —     |
 
 :::note
 `AdminCreateUser`: password complexity rules are not enforced (only minimum length is checked). `ForceAliasCreation` and `DesiredDeliveryMediums` are accepted but ignored — no invitation messages are sent.
@@ -164,31 +164,31 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 
 ### Group management
 
-| Operation                   | Supported |
-| --------------------------- | :-------: |
-| `CreateGroup`               |     ✓     |
-| `GetGroup`                  |     ✓     |
-| `UpdateGroup`               |     ✓     |
-| `DeleteGroup`               |     ✓     |
-| `ListGroups`                |     ✓     |
-| `ListUsersInGroup`          |     ✓     |
-| `AdminAddUserToGroup`       |     ✓     |
-| `AdminRemoveUserFromGroup`  |     ✓     |
-| `AdminListGroupsForUser`    |     ✓     |
+| Operation                  | Supported |
+| -------------------------- | :-------: |
+| `CreateGroup`              |     ✓     |
+| `GetGroup`                 |     ✓     |
+| `UpdateGroup`              |     ✓     |
+| `DeleteGroup`              |     ✓     |
+| `ListGroups`               |     ✓     |
+| `ListUsersInGroup`         |     ✓     |
+| `AdminAddUserToGroup`      |     ✓     |
+| `AdminRemoveUserFromGroup` |     ✓     |
+| `AdminListGroupsForUser`   |     ✓     |
 
 ### Device management
 
-| Operation              | Supported |
-| ---------------------- | :-------: |
-| `ConfirmDevice`        |     —     |
-| `ForgetDevice`         |     —     |
-| `GetDevice`            |     —     |
-| `ListDevices`          |     —     |
-| `UpdateDeviceStatus`   |     —     |
-| `AdminForgetDevice`    |     —     |
-| `AdminGetDevice`       |     —     |
-| `AdminListDevices`     |     —     |
-| `AdminUpdateDeviceStatus` |     —  |
+| Operation                 | Supported |
+| ------------------------- | :-------: |
+| `ConfirmDevice`           |     —     |
+| `ForgetDevice`            |     —     |
+| `GetDevice`               |     —     |
+| `ListDevices`             |     —     |
+| `UpdateDeviceStatus`      |     —     |
+| `AdminForgetDevice`       |     —     |
+| `AdminGetDevice`          |     —     |
+| `AdminListDevices`        |     —     |
+| `AdminUpdateDeviceStatus` |     —     |
 
 ### MFA & WebAuthn
 
@@ -203,52 +203,52 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 
 ### Identity providers
 
-| Operation                       | Supported |
-| ------------------------------- | :-------: |
-| `CreateIdentityProvider`        |     —     |
-| `DescribeIdentityProvider`      |     —     |
-| `UpdateIdentityProvider`        |     —     |
-| `DeleteIdentityProvider`        |     —     |
-| `ListIdentityProviders`         |     —     |
-| `GetIdentityProviderByIdentifier` |     —   |
+| Operation                         | Supported |
+| --------------------------------- | :-------: |
+| `CreateIdentityProvider`          |     —     |
+| `DescribeIdentityProvider`        |     —     |
+| `UpdateIdentityProvider`          |     —     |
+| `DeleteIdentityProvider`          |     —     |
+| `ListIdentityProviders`           |     —     |
+| `GetIdentityProviderByIdentifier` |     —     |
 
 ### Resource servers
 
-| Operation               | Supported |
-| ----------------------- | :-------: |
-| `CreateResourceServer`  |     —     |
-| `DescribeResourceServer`|     —     |
-| `UpdateResourceServer`  |     —     |
-| `DeleteResourceServer`  |     —     |
-| `ListResourceServers`   |     —     |
+| Operation                | Supported |
+| ------------------------ | :-------: |
+| `CreateResourceServer`   |     —     |
+| `DescribeResourceServer` |     —     |
+| `UpdateResourceServer`   |     —     |
+| `DeleteResourceServer`   |     —     |
+| `ListResourceServers`    |     —     |
 
 ### User import
 
-| Operation              | Supported |
-| ---------------------- | :-------: |
-| `GetCSVHeader`         |     —     |
-| `CreateUserImportJob`  |     —     |
-| `DescribeUserImportJob`|     —     |
-| `StartUserImportJob`   |     —     |
-| `StopUserImportJob`    |     —     |
-| `ListUserImportJobs`   |     —     |
+| Operation               | Supported |
+| ----------------------- | :-------: |
+| `GetCSVHeader`          |     —     |
+| `CreateUserImportJob`   |     —     |
+| `DescribeUserImportJob` |     —     |
+| `StartUserImportJob`    |     —     |
+| `StopUserImportJob`     |     —     |
+| `ListUserImportJobs`    |     —     |
 
 ### Risk configuration
 
-| Operation                  | Supported |
-| -------------------------- | :-------: |
-| `DescribeRiskConfiguration`|     —     |
-| `SetRiskConfiguration`     |     —     |
+| Operation                   | Supported |
+| --------------------------- | :-------: |
+| `DescribeRiskConfiguration` |     —     |
+| `SetRiskConfiguration`      |     —     |
 
 ### Managed login branding
 
-| Operation                             | Supported |
-| ------------------------------------- | :-------: |
-| `CreateManagedLoginBranding`          |     —     |
-| `DescribeManagedLoginBranding`        |     —     |
-| `DescribeManagedLoginBrandingByClient`|     —     |
-| `UpdateManagedLoginBranding`          |     —     |
-| `DeleteManagedLoginBranding`          |     —     |
+| Operation                              | Supported |
+| -------------------------------------- | :-------: |
+| `CreateManagedLoginBranding`           |     —     |
+| `DescribeManagedLoginBranding`         |     —     |
+| `DescribeManagedLoginBrandingByClient` |     —     |
+| `UpdateManagedLoginBranding`           |     —     |
+| `DeleteManagedLoginBranding`           |     —     |
 
 ### Terms
 
@@ -262,96 +262,100 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 
 ### Tagging
 
-| Operation            | Supported |
-| -------------------- | :-------: |
-| `TagResource`        |     —     |
-| `UntagResource`      |     —     |
-| `ListTagsForResource`|     —     |
+| Operation             | Supported |
+| --------------------- | :-------: |
+| `TagResource`         |     —     |
+| `UntagResource`       |     —     |
+| `ListTagsForResource` |     —     |
 
 ## Quick start
 
 <Tabs>
   <TabItem label="Go">
     ```go
+    package main
+
     import (
-        "context"
-        "fmt"
+    	"context"
+    	"fmt"
 
-        "github.com/aws/aws-sdk-go-v2/aws"
-        "github.com/aws/aws-sdk-go-v2/config"
-        "github.com/aws/aws-sdk-go-v2/credentials"
-        "github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
-        "github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
+    	"github.com/aws/aws-sdk-go-v2/aws"
+    	"github.com/aws/aws-sdk-go-v2/config"
+    	"github.com/aws/aws-sdk-go-v2/credentials"
+    	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
+    	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
     )
 
-    cfg, err := config.LoadDefaultConfig(context.Background(),
-        config.WithRegion("us-east-1"),
-        config.WithCredentialsProvider(
-            credentials.NewStaticCredentialsProvider("test", "test", ""),
-        ),
-    )
-    if err != nil {
-        panic(err)
-    }
+    func main() {
+    	cfg, err := config.LoadDefaultConfig(context.Background(),
+    		config.WithRegion("us-east-1"),
+    		config.WithCredentialsProvider(
+    			credentials.NewStaticCredentialsProvider("test", "test", ""),
+    		),
+    	)
+    	if err != nil {
+    		panic(err)
+    	}
 
-    client := cognitoidentityprovider.NewFromConfig(cfg, func(o *cognitoidentityprovider.Options) {
-        o.BaseEndpoint = aws.String("http://localhost:5566")
-    })
+    	client := cognitoidentityprovider.NewFromConfig(cfg, func(o *cognitoidentityprovider.Options) {
+    		o.BaseEndpoint = aws.String("http://localhost:5566")
+    	})
 
-    // Create a user pool
-    pool, err := client.CreateUserPool(context.Background(), &cognitoidentityprovider.CreateUserPoolInput{
-        PoolName: aws.String("my-pool"),
-    })
-    if err != nil {
-        panic(err)
-    }
-    userPoolID := pool.UserPool.Id
+    	// Create a user pool
+    	pool, err := client.CreateUserPool(context.Background(), &cognitoidentityprovider.CreateUserPoolInput{
+    		PoolName: aws.String("my-pool"),
+    	})
+    	if err != nil {
+    		panic(err)
+    	}
+    	userPoolID := pool.UserPool.Id
 
-    // Create a user pool client
-    appClient, err := client.CreateUserPoolClient(context.Background(), &cognitoidentityprovider.CreateUserPoolClientInput{
-        UserPoolId: userPoolID,
-        ClientName: aws.String("my-app"),
-        ExplicitAuthFlows: []types.ExplicitAuthFlowsType{
-            types.ExplicitAuthFlowsTypeAllowUserPasswordAuth,
-        },
-    })
-    if err != nil {
-        panic(err)
-    }
-    clientID := appClient.UserPoolClient.ClientId
+    	// Create a user pool client
+    	appClient, err := client.CreateUserPoolClient(context.Background(), &cognitoidentityprovider.CreateUserPoolClientInput{
+    		UserPoolId: userPoolID,
+    		ClientName: aws.String("my-app"),
+    		ExplicitAuthFlows: []types.ExplicitAuthFlowsType{
+    			types.ExplicitAuthFlowsTypeAllowUserPasswordAuth,
+    		},
+    	})
+    	if err != nil {
+    		panic(err)
+    	}
+    	clientID := appClient.UserPoolClient.ClientId
 
-    // Sign up a user (confirmation code is logged to the kumolo server log)
-    _, err = client.SignUp(context.Background(), &cognitoidentityprovider.SignUpInput{
-        ClientId: clientID,
-        Username: aws.String("alice"),
-        Password: aws.String("P@ssw0rd!"),
-    })
-    if err != nil {
-        panic(err)
-    }
+    	// Sign up a user (confirmation code is logged to the kumolo server log)
+    	_, err = client.SignUp(context.Background(), &cognitoidentityprovider.SignUpInput{
+    		ClientId: clientID,
+    		Username: aws.String("alice"),
+    		Password: aws.String("P@ssw0rd!"),
+    	})
+    	if err != nil {
+    		panic(err)
+    	}
 
-    // Admin confirm so no code retrieval is needed in tests
-    _, err = client.AdminConfirmSignUp(context.Background(), &cognitoidentityprovider.AdminConfirmSignUpInput{
-        UserPoolId: userPoolID,
-        Username:   aws.String("alice"),
-    })
-    if err != nil {
-        panic(err)
-    }
+    	// Admin confirm so no code retrieval is needed in tests
+    	_, err = client.AdminConfirmSignUp(context.Background(), &cognitoidentityprovider.AdminConfirmSignUpInput{
+    		UserPoolId: userPoolID,
+    		Username:   aws.String("alice"),
+    	})
+    	if err != nil {
+    		panic(err)
+    	}
 
-    // Authenticate
-    auth, err := client.InitiateAuth(context.Background(), &cognitoidentityprovider.InitiateAuthInput{
-        ClientId: clientID,
-        AuthFlow: types.AuthFlowTypeUserPasswordAuth,
-        AuthParameters: map[string]string{
-            "USERNAME": "alice",
-            "PASSWORD": "P@ssw0rd!",
-        },
-    })
-    if err != nil {
-        panic(err)
+    	// Authenticate
+    	auth, err := client.InitiateAuth(context.Background(), &cognitoidentityprovider.InitiateAuthInput{
+    		ClientId: clientID,
+    		AuthFlow: types.AuthFlowTypeUserPasswordAuth,
+    		AuthParameters: map[string]string{
+    			"USERNAME": "alice",
+    			"PASSWORD": "P@ssw0rd!",
+    		},
+    	})
+    	if err != nil {
+    		panic(err)
+    	}
+    	fmt.Println("AccessToken:", *auth.AuthenticationResult.AccessToken)
     }
-    fmt.Println("AccessToken:", *auth.AuthenticationResult.AccessToken)
     ```
 
   </TabItem>
@@ -414,6 +418,7 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
       --client-name my-app \
       --explicit-auth-flows ALLOW_USER_PASSWORD_AUTH \
       --endpoint-url http://localhost:5566 \
+      --region us-east-1 \
       --query 'UserPoolClient.ClientId' --output text)
 
     # Sign up a user
@@ -421,20 +426,23 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
       --client-id "$CLIENT_ID" \
       --username alice \
       --password 'P@ssw0rd!' \
-      --endpoint-url http://localhost:5566
+      --endpoint-url http://localhost:5566 \
+      --region us-east-1
 
     # Admin confirm
     aws cognito-idp admin-confirm-sign-up \
       --user-pool-id "$POOL_ID" \
       --username alice \
-      --endpoint-url http://localhost:5566
+      --endpoint-url http://localhost:5566 \
+      --region us-east-1
 
     # Authenticate
     aws cognito-idp initiate-auth \
       --client-id "$CLIENT_ID" \
       --auth-flow USER_PASSWORD_AUTH \
       --auth-parameters USERNAME=alice,PASSWORD='P@ssw0rd!' \
-      --endpoint-url http://localhost:5566
+      --endpoint-url http://localhost:5566 \
+      --region us-east-1
     ```
 
   </TabItem>

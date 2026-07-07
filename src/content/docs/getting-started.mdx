@@ -254,6 +254,19 @@ Like DynamoDB, STS does not need `UsePathStyle` — only `BaseEndpoint` is requi
 
 ---
 
+**Cognito: requests hitting real AWS**
+
+Verify that `BaseEndpoint` is set to `http://localhost:5566` in your Cognito client options.
+`UsePathStyle` is not required — only `BaseEndpoint`.
+
+---
+
+**Cognito: confirmation code never arrives**
+
+kumolo does not send email or SMS. The confirmation code is written to the kumolo server log (`KUMOLO_LOG_LEVEL=info` or higher). In tests, use `AdminConfirmSignUp` to bypass code delivery entirely.
+
+---
+
 **Debug request/response traffic**
 
 Set `KUMOLO_LOG_LEVEL=debug` to log every incoming request:

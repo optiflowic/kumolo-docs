@@ -1,0 +1,454 @@
+---
+title: Cognito
+description: Supported Cognito User Pools operations in kumolo.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+kumolo implements the Cognito User Pools REST API. All operations accept standard AWS SDK v2 requests — point your client at `http://localhost:5566`.
+Unlike S3, `UsePathStyle` is not required; only `BaseEndpoint` needs to be overridden on the client.
+
+A JWKS endpoint is available at `http://localhost:5566/{userPoolId}/.well-known/jwks.json` for JWT verification.
+
+## Support levels
+
+| Symbol | Meaning                                                                                   |
+| :----: | ----------------------------------------------------------------------------------------- |
+|   ✓    | Fully implemented — the feature behaves like real AWS                                     |
+|   ◐    | Partial support — the operation works but has known limitations; see the note for details |
+|   —    | Not yet implemented                                                                       |
+
+## Operation support
+
+Operations sourced from [`internal/cognito/router.go`](https://github.com/optiflowic/kumolo/blob/main/internal/cognito/router.go) in the kumolo repository.
+
+### User pool management
+
+| Operation                     | Supported |
+| ----------------------------- | :-------: |
+| `CreateUserPool`              |     ◐     |
+| `DescribeUserPool`            |     ✓     |
+| `UpdateUserPool`              |     ◐     |
+| `DeleteUserPool`              |     ✓     |
+| `ListUserPools`               |     ✓     |
+| `GetUserPoolMfaConfig`        |     ◐     |
+| `SetUserPoolMfaConfig`        |     —     |
+| `AddCustomAttributes`         |     —     |
+| `GetLogDeliveryConfiguration` |     —     |
+| `SetLogDeliveryConfiguration` |     —     |
+| `GetSigningCertificate`       |     —     |
+
+:::note
+Password policy enforcement: only minimum length (8 characters) is checked. Complexity rules (`RequireUppercase`, `RequireLowercase`, `RequireNumbers`, `RequireSymbols`) are accepted and stored but not enforced.
+
+`DeletionProtection` is accepted and stored but not enforced — pools can always be deleted in kumolo for test ergonomics.
+
+`GetUserPoolMfaConfig`: `SoftwareTokenMfaConfiguration.Enabled` is always returned as `false` (TOTP is not supported). MFA is not enforced in any auth flow.
+:::
+
+### User pool domains
+
+| Operation                | Supported |
+| ------------------------ | :-------: |
+| `CreateUserPoolDomain`   |     —     |
+| `UpdateUserPoolDomain`   |     —     |
+| `DeleteUserPoolDomain`   |     —     |
+| `DescribeUserPoolDomain` |     —     |
+
+### User pool replicas
+
+| Operation               | Supported |
+| ----------------------- | :-------: |
+| `CreateUserPoolReplica` |     —     |
+| `UpdateUserPoolReplica` |     —     |
+| `DeleteUserPoolReplica` |     —     |
+| `ListUserPoolReplicas`  |     —     |
+
+### User pool clients
+
+| Operation                    | Supported |
+| ---------------------------- | :-------: |
+| `CreateUserPoolClient`       |     ◐     |
+| `DescribeUserPoolClient`     |     ✓     |
+| `UpdateUserPoolClient`       |     ◐     |
+| `DeleteUserPoolClient`       |     ✓     |
+| `ListUserPoolClients`        |     ✓     |
+| `AddUserPoolClientSecret`    |     —     |
+| `DeleteUserPoolClientSecret` |     —     |
+| `ListUserPoolClientSecrets`  |     —     |
+
+:::note
+Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleared rather than defaulted to AWS defaults. `ClientSecret` is generated if `GenerateSecret: true` but is not validated on any auth request.
+:::
+
+### Authentication
+
+| Operation                     | Supported |
+| ----------------------------- | :-------: |
+| `SignUp`                      |     ◐     |
+| `ConfirmSignUp`               |     ✓     |
+| `ResendConfirmationCode`      |     ◐     |
+| `InitiateAuth`                |     ◐     |
+| `RespondToAuthChallenge`      |     ◐     |
+| `AdminInitiateAuth`           |     —     |
+| `AdminRespondToAuthChallenge` |     —     |
+| `ForgotPassword`              |     —     |
+| `ConfirmForgotPassword`       |     —     |
+| `ChangePassword`              |     —     |
+| `GetTokensFromRefreshToken`   |     —     |
+| `RevokeToken`                 |     ✓     |
+| `GlobalSignOut`               |     ✓     |
+| `AdminUserGlobalSignOut`      |     —     |
+
+`InitiateAuth` supports the following auth flows:
+
+- `USER_PASSWORD_AUTH` — username and password authentication
+- `REFRESH_TOKEN_AUTH` — exchange a refresh token for new tokens
+
+`RespondToAuthChallenge` supports the `NEW_PASSWORD_REQUIRED` challenge.
+
+:::note
+**Confirmation codes**: codes issued by `SignUp` and `ResendConfirmationCode` are written to the kumolo server log instead of being sent via email or SMS. Use `AdminConfirmSignUp` in tests to skip code retrieval entirely.
+
+**Token expiry**: `ExpiresIn` (3600 s) is returned but not enforced. `TokenValidityUnits` is stored but not checked — `RefreshTokenValidity` is always interpreted as days.
+
+**`SecretHash`, `ClientMetadata`, `AnalyticsMetadata`, `UserContextData`**: accepted on all auth operations but ignored. Lambda triggers are not supported.
+
+**`RespondToAuthChallenge`**: `USERNAME` is optional in kumolo (taken from the session JWT when omitted); on real AWS it is required.
+:::
+
+### User operations
+
+| Operation                          | Supported |
+| ---------------------------------- | :-------: |
+| `GetUser`                          |     ✓     |
+| `UpdateUserAttributes`             |     —     |
+| `DeleteUserAttributes`             |     —     |
+| `DeleteUser`                       |     —     |
+| `GetUserAttributeVerificationCode` |     —     |
+| `VerifyUserAttribute`              |     —     |
+| `GetUserAuthFactors`               |     —     |
+| `SetUserMFAPreference`             |     —     |
+| `SetUserSettings`                  |     —     |
+| `GetUICustomization`               |     —     |
+| `SetUICustomization`               |     —     |
+| `UpdateAuthEventFeedback`          |     —     |
+
+### Admin operations
+
+| Operation                      | Supported |
+| ------------------------------ | :-------: |
+| `AdminCreateUser`              |     ◐     |
+| `AdminGetUser`                 |     ✓     |
+| `AdminSetUserPassword`         |     ◐     |
+| `AdminConfirmSignUp`           |     ✓     |
+| `AdminDeleteUser`              |     ✓     |
+| `AdminDisableUser`             |     —     |
+| `AdminEnableUser`              |     —     |
+| `AdminUpdateUserAttributes`    |     —     |
+| `AdminDeleteUserAttributes`    |     —     |
+| `AdminResetUserPassword`       |     —     |
+| `AdminSetUserMFAPreference`    |     —     |
+| `AdminSetUserSettings`         |     —     |
+| `AdminListUserAuthEvents`      |     —     |
+| `AdminUpdateAuthEventFeedback` |     —     |
+| `AdminDisableProviderForUser`  |     —     |
+| `AdminLinkProviderForUser`     |     —     |
+
+:::note
+`AdminCreateUser`: password complexity rules are not enforced (only minimum length is checked). `ForceAliasCreation` and `DesiredDeliveryMediums` are accepted but ignored — no invitation messages are sent.
+
+`AdminSetUserPassword`: password complexity rules are not enforced. Password history policy (`PasswordHistoryPolicyViolationException`) is not applied.
+:::
+
+### User listing
+
+| Operation   | Supported |
+| ----------- | :-------: |
+| `ListUsers` |     —     |
+
+### Group management
+
+| Operation                  | Supported |
+| -------------------------- | :-------: |
+| `CreateGroup`              |     ✓     |
+| `GetGroup`                 |     ✓     |
+| `UpdateGroup`              |     ✓     |
+| `DeleteGroup`              |     ✓     |
+| `ListGroups`               |     ✓     |
+| `ListUsersInGroup`         |     ✓     |
+| `AdminAddUserToGroup`      |     ✓     |
+| `AdminRemoveUserFromGroup` |     ✓     |
+| `AdminListGroupsForUser`   |     ✓     |
+
+### Device management
+
+| Operation                 | Supported |
+| ------------------------- | :-------: |
+| `ConfirmDevice`           |     —     |
+| `ForgetDevice`            |     —     |
+| `GetDevice`               |     —     |
+| `ListDevices`             |     —     |
+| `UpdateDeviceStatus`      |     —     |
+| `AdminForgetDevice`       |     —     |
+| `AdminGetDevice`          |     —     |
+| `AdminListDevices`        |     —     |
+| `AdminUpdateDeviceStatus` |     —     |
+
+### MFA & WebAuthn
+
+| Operation                      | Supported |
+| ------------------------------ | :-------: |
+| `AssociateSoftwareToken`       |     —     |
+| `VerifySoftwareToken`          |     —     |
+| `StartWebAuthnRegistration`    |     —     |
+| `CompleteWebAuthnRegistration` |     —     |
+| `DeleteWebAuthnCredential`     |     —     |
+| `ListWebAuthnCredentials`      |     —     |
+
+### Identity providers
+
+| Operation                         | Supported |
+| --------------------------------- | :-------: |
+| `CreateIdentityProvider`          |     —     |
+| `DescribeIdentityProvider`        |     —     |
+| `UpdateIdentityProvider`          |     —     |
+| `DeleteIdentityProvider`          |     —     |
+| `ListIdentityProviders`           |     —     |
+| `GetIdentityProviderByIdentifier` |     —     |
+
+### Resource servers
+
+| Operation                | Supported |
+| ------------------------ | :-------: |
+| `CreateResourceServer`   |     —     |
+| `DescribeResourceServer` |     —     |
+| `UpdateResourceServer`   |     —     |
+| `DeleteResourceServer`   |     —     |
+| `ListResourceServers`    |     —     |
+
+### User import
+
+| Operation               | Supported |
+| ----------------------- | :-------: |
+| `GetCSVHeader`          |     —     |
+| `CreateUserImportJob`   |     —     |
+| `DescribeUserImportJob` |     —     |
+| `StartUserImportJob`    |     —     |
+| `StopUserImportJob`     |     —     |
+| `ListUserImportJobs`    |     —     |
+
+### Risk configuration
+
+| Operation                   | Supported |
+| --------------------------- | :-------: |
+| `DescribeRiskConfiguration` |     —     |
+| `SetRiskConfiguration`      |     —     |
+
+### Managed login branding
+
+| Operation                              | Supported |
+| -------------------------------------- | :-------: |
+| `CreateManagedLoginBranding`           |     —     |
+| `DescribeManagedLoginBranding`         |     —     |
+| `DescribeManagedLoginBrandingByClient` |     —     |
+| `UpdateManagedLoginBranding`           |     —     |
+| `DeleteManagedLoginBranding`           |     —     |
+
+### Terms
+
+| Operation       | Supported |
+| --------------- | :-------: |
+| `CreateTerms`   |     —     |
+| `DescribeTerms` |     —     |
+| `ListTerms`     |     —     |
+| `UpdateTerms`   |     —     |
+| `DeleteTerms`   |     —     |
+
+### Tagging
+
+| Operation             | Supported |
+| --------------------- | :-------: |
+| `TagResource`         |     ✓     |
+| `UntagResource`       |     ✓     |
+| `ListTagsForResource` |     ✓     |
+
+## Quick start
+
+<Tabs>
+  <TabItem label="Go">
+    ```go
+    package main
+
+    import (
+    	"context"
+    	"fmt"
+
+    	"github.com/aws/aws-sdk-go-v2/aws"
+    	"github.com/aws/aws-sdk-go-v2/config"
+    	"github.com/aws/aws-sdk-go-v2/credentials"
+    	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
+    	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
+    )
+
+    func main() {
+    	cfg, err := config.LoadDefaultConfig(context.Background(),
+    		config.WithRegion("us-east-1"),
+    		config.WithCredentialsProvider(
+    			credentials.NewStaticCredentialsProvider("test", "test", ""),
+    		),
+    	)
+    	if err != nil {
+    		panic(err)
+    	}
+
+    	client := cognitoidentityprovider.NewFromConfig(cfg, func(o *cognitoidentityprovider.Options) {
+    		o.BaseEndpoint = aws.String("http://localhost:5566")
+    	})
+
+    	// Create a user pool
+    	pool, err := client.CreateUserPool(context.Background(), &cognitoidentityprovider.CreateUserPoolInput{
+    		PoolName: aws.String("my-pool"),
+    	})
+    	if err != nil {
+    		panic(err)
+    	}
+    	userPoolID := pool.UserPool.Id
+
+    	// Create a user pool client
+    	appClient, err := client.CreateUserPoolClient(context.Background(), &cognitoidentityprovider.CreateUserPoolClientInput{
+    		UserPoolId: userPoolID,
+    		ClientName: aws.String("my-app"),
+    		ExplicitAuthFlows: []types.ExplicitAuthFlowsType{
+    			types.ExplicitAuthFlowsTypeAllowUserPasswordAuth,
+    		},
+    	})
+    	if err != nil {
+    		panic(err)
+    	}
+    	clientID := appClient.UserPoolClient.ClientId
+
+    	// Sign up a user (confirmation code is logged to the kumolo server log)
+    	_, err = client.SignUp(context.Background(), &cognitoidentityprovider.SignUpInput{
+    		ClientId: clientID,
+    		Username: aws.String("alice"),
+    		Password: aws.String("P@ssw0rd!"),
+    	})
+    	if err != nil {
+    		panic(err)
+    	}
+
+    	// Admin confirm so no code retrieval is needed in tests
+    	_, err = client.AdminConfirmSignUp(context.Background(), &cognitoidentityprovider.AdminConfirmSignUpInput{
+    		UserPoolId: userPoolID,
+    		Username:   aws.String("alice"),
+    	})
+    	if err != nil {
+    		panic(err)
+    	}
+
+    	// Authenticate
+    	auth, err := client.InitiateAuth(context.Background(), &cognitoidentityprovider.InitiateAuthInput{
+    		ClientId: clientID,
+    		AuthFlow: types.AuthFlowTypeUserPasswordAuth,
+    		AuthParameters: map[string]string{
+    			"USERNAME": "alice",
+    			"PASSWORD": "P@ssw0rd!",
+    		},
+    	})
+    	if err != nil {
+    		panic(err)
+    	}
+    	fmt.Println("AccessToken:", *auth.AuthenticationResult.AccessToken)
+    }
+    ```
+
+  </TabItem>
+  <TabItem label="Python (boto3)">
+    ```python
+    import boto3
+
+    client = boto3.client(
+        "cognito-idp",
+        region_name="us-east-1",
+        endpoint_url="http://localhost:5566",
+        aws_access_key_id="test",
+        aws_secret_access_key="test",
+    )
+
+    # Create a user pool
+    pool = client.create_user_pool(PoolName="my-pool")
+    user_pool_id = pool["UserPool"]["Id"]
+
+    # Create a user pool client
+    app_client = client.create_user_pool_client(
+        UserPoolId=user_pool_id,
+        ClientName="my-app",
+        ExplicitAuthFlows=["ALLOW_USER_PASSWORD_AUTH"],
+    )
+    client_id = app_client["UserPoolClient"]["ClientId"]
+
+    # Sign up a user
+    client.sign_up(
+        ClientId=client_id,
+        Username="alice",
+        Password="P@ssw0rd!",
+    )
+
+    # Admin confirm
+    client.admin_confirm_sign_up(UserPoolId=user_pool_id, Username="alice")
+
+    # Authenticate
+    auth = client.initiate_auth(
+        ClientId=client_id,
+        AuthFlow="USER_PASSWORD_AUTH",
+        AuthParameters={"USERNAME": "alice", "PASSWORD": "P@ssw0rd!"},
+    )
+    print("AccessToken:", auth["AuthenticationResult"]["AccessToken"])
+    ```
+
+  </TabItem>
+  <TabItem label="AWS CLI">
+    ```bash
+    # Create a user pool
+    POOL_ID=$(aws cognito-idp create-user-pool \
+      --pool-name my-pool \
+      --endpoint-url http://localhost:5566 \
+      --region us-east-1 \
+      --query 'UserPool.Id' --output text)
+
+    # Create a user pool client
+    CLIENT_ID=$(aws cognito-idp create-user-pool-client \
+      --user-pool-id "$POOL_ID" \
+      --client-name my-app \
+      --explicit-auth-flows ALLOW_USER_PASSWORD_AUTH \
+      --endpoint-url http://localhost:5566 \
+      --region us-east-1 \
+      --query 'UserPoolClient.ClientId' --output text)
+
+    # Sign up a user
+    aws cognito-idp sign-up \
+      --client-id "$CLIENT_ID" \
+      --username alice \
+      --password 'P@ssw0rd!' \
+      --endpoint-url http://localhost:5566 \
+      --region us-east-1
+
+    # Admin confirm
+    aws cognito-idp admin-confirm-sign-up \
+      --user-pool-id "$POOL_ID" \
+      --username alice \
+      --endpoint-url http://localhost:5566 \
+      --region us-east-1
+
+    # Authenticate
+    aws cognito-idp initiate-auth \
+      --client-id "$CLIENT_ID" \
+      --auth-flow USER_PASSWORD_AUTH \
+      --auth-parameters USERNAME=alice,PASSWORD='P@ssw0rd!' \
+      --endpoint-url http://localhost:5566 \
+      --region us-east-1
+    ```
+
+  </TabItem>
+</Tabs>

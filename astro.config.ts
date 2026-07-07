@@ -29,6 +29,7 @@ export default defineConfig({
           collapsed: false,
           items: [
             { label: 'Overview', slug: 'services' },
+            { label: 'Cognito', slug: 'services/cognito' },
             { label: 'DynamoDB', slug: 'services/dynamodb' },
             { label: 'KMS', slug: 'services/kms' },
             { label: 'S3', slug: 'services/s3' },

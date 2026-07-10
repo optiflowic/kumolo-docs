@@ -122,17 +122,23 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 | Operation                          | Supported |
 | ---------------------------------- | :-------: |
 | `GetUser`                          |     ✓     |
-| `UpdateUserAttributes`             |     —     |
+| `UpdateUserAttributes`             |     ◐     |
 | `DeleteUserAttributes`             |     —     |
-| `DeleteUser`                       |     —     |
-| `GetUserAttributeVerificationCode` |     —     |
-| `VerifyUserAttribute`              |     —     |
+| `DeleteUser`                       |     ✓     |
+| `GetUserAttributeVerificationCode` |     ◐     |
+| `VerifyUserAttribute`              |     ◐     |
 | `GetUserAuthFactors`               |     —     |
 | `SetUserMFAPreference`             |     —     |
 | `SetUserSettings`                  |     —     |
 | `GetUICustomization`               |     —     |
 | `SetUICustomization`               |     —     |
 | `UpdateAuthEventFeedback`          |     —     |
+
+:::note
+`UpdateUserAttributes`: real AWS holds a new `email`/`phone_number` value pending until verified via `VerifyUserAttribute`. kumolo has no email/SMS delivery to gate on, so it applies every attribute change immediately. Changing `email`/`phone_number` still resets the paired `email_verified`/`phone_number_verified` attribute to `false` and generates a verification code (logged at Info level, same as `SignUp`).
+
+`GetUserAttributeVerificationCode` / `VerifyUserAttribute`: `AttributeName` is restricted to `email` or `phone_number` — the only attributes kumolo tracks a verification code for.
+:::
 
 ### Admin operations
 
@@ -143,9 +149,9 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 | `AdminSetUserPassword`         |     ◐     |
 | `AdminConfirmSignUp`           |     ✓     |
 | `AdminDeleteUser`              |     ✓     |
-| `AdminDisableUser`             |     —     |
-| `AdminEnableUser`              |     —     |
-| `AdminUpdateUserAttributes`    |     —     |
+| `AdminDisableUser`             |     ✓     |
+| `AdminEnableUser`              |     ✓     |
+| `AdminUpdateUserAttributes`    |     ◐     |
 | `AdminDeleteUserAttributes`    |     —     |
 | `AdminResetUserPassword`       |     —     |
 | `AdminSetUserMFAPreference`    |     —     |
@@ -159,13 +165,19 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 `AdminCreateUser`: password complexity rules are not enforced (only minimum length is checked). `ForceAliasCreation` and `DesiredDeliveryMediums` are accepted but ignored — no invitation messages are sent.
 
 `AdminSetUserPassword`: password complexity rules are not enforced. Password history policy (`PasswordHistoryPolicyViolationException`) is not applied.
+
+`AdminUpdateUserAttributes`: same immediate-apply behavior as `UpdateUserAttributes`. Admins can skip verification-code generation entirely by including `email_verified`/`phone_number_verified` set to `"true"` in the same request.
 :::
 
 ### User listing
 
 | Operation   | Supported |
 | ----------- | :-------: |
-| `ListUsers` |     —     |
+| `ListUsers` |     ◐     |
+
+:::note
+`ListUsers`: `Filter` supports a subset of real AWS's syntax — `AttributeName = "Value"` (exact match) or `AttributeName ^= "Value"` (prefix match) against one of `username`, `sub`, `cognito:user_status`, `status` (compares against `Enabled`), `email`, `phone_number`, `name`, `given_name`, `family_name`, or `preferred_username`. Custom attributes and embedded-quote escaping are not supported. `AttributesToGet` is accepted but ignored — all attributes are always returned.
+:::
 
 ### Group management
 

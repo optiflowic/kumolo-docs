@@ -92,9 +92,9 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 | `RespondToAuthChallenge`      |     ◐     |
 | `AdminInitiateAuth`           |     —     |
 | `AdminRespondToAuthChallenge` |     —     |
-| `ForgotPassword`              |     —     |
-| `ConfirmForgotPassword`       |     —     |
-| `ChangePassword`              |     —     |
+| `ForgotPassword`              |     ◐     |
+| `ConfirmForgotPassword`       |     ◐     |
+| `ChangePassword`              |     ◐     |
 | `GetTokensFromRefreshToken`   |     —     |
 | `RevokeToken`                 |     ✓     |
 | `GlobalSignOut`               |     ✓     |
@@ -115,6 +115,10 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 **`SecretHash`, `ClientMetadata`, `AnalyticsMetadata`, `UserContextData`**: accepted on all auth operations but ignored. Lambda triggers are not supported.
 
 **`RespondToAuthChallenge`**: `USERNAME` is optional in kumolo (taken from the session JWT when omitted); on real AWS it is required.
+
+**`ForgotPassword` / `ConfirmForgotPassword`**: like `SignUp`, the reset code is written to the kumolo server log (`ForgotPassword` message) instead of being emailed or texted. `ForgotPassword` requires the user to have a verified `email` or `phone_number` attribute (`email_verified`/`phone_number_verified` set to `"true"`), matching real AWS's requirement — email is preferred when both are verified. The code has no expiry (`ExpiredCodeException` is not implemented), and `PreventUserExistenceErrors` is not enforced — a missing username always returns `UserNotFoundException`.
+
+**`ChangePassword`**: password history policy (`PasswordHistoryPolicyViolationException`) is not applied, and the access token's OAuth scope is not checked.
 :::
 
 ### User operations

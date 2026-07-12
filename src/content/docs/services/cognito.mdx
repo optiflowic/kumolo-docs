@@ -39,11 +39,11 @@ Operations sourced from [`internal/cognito/router.go`](https://github.com/optifl
 | `GetSigningCertificate`       |     —     |
 
 :::note
-Password policy enforcement: minimum length (default 8 characters) and complexity rules (`RequireUppercase`, `RequireLowercase`, `RequireNumbers`, `RequireSymbols`, all default `true`) are enforced on every operation that accepts a plaintext password (`SignUp`, `AdminCreateUser`, `AdminSetUserPassword`, `RespondToAuthChallenge`'s `NEW_PASSWORD_REQUIRED`, `ConfirmForgotPassword`, `ChangePassword`). `PasswordHistorySize` is accepted and stored but not enforced — no password history is tracked.
+Password policy enforcement: kumolo enforces minimum length (default 8 characters) and complexity rules (`RequireUppercase`, `RequireLowercase`, `RequireNumbers`, `RequireSymbols`, all default `true`) on every operation that accepts a plaintext password (`SignUp`, `AdminCreateUser`, `AdminSetUserPassword`, `RespondToAuthChallenge`'s `NEW_PASSWORD_REQUIRED`, `ConfirmForgotPassword`, `ChangePassword`). kumolo accepts and stores `PasswordHistorySize` but does not enforce it — no password history is tracked.
 
-`DeletionProtection` is accepted and stored but not enforced — pools can always be deleted in kumolo for test ergonomics.
+kumolo accepts and stores `DeletionProtection` but does not enforce it — pools can always be deleted in kumolo for test ergonomics.
 
-`GetUserPoolMfaConfig` / `SetUserPoolMfaConfig`: only `MfaConfiguration` (`OFF`/`ON`/`OPTIONAL`) is persisted. `SoftwareTokenMfaConfiguration.Enabled` is always returned as `false` (TOTP is not supported), and `SmsMfaConfiguration`/`EmailMfaConfiguration`/`WebAuthnConfiguration` are accepted but silently ignored. MFA is not enforced in any auth flow.
+`GetUserPoolMfaConfig` / `SetUserPoolMfaConfig`: kumolo persists only `MfaConfiguration` (`OFF`/`ON`/`OPTIONAL`). kumolo always returns `SoftwareTokenMfaConfiguration.Enabled` as `false` (TOTP is not supported), and kumolo accepts but silently ignores `SmsMfaConfiguration`/`EmailMfaConfiguration`/`WebAuthnConfiguration`. kumolo does not enforce MFA in any auth flow.
 :::
 
 ### User pool domains

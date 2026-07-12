@@ -116,9 +116,9 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 
 **`RespondToAuthChallenge`**: `USERNAME` is optional in kumolo (taken from the session JWT when omitted); on real AWS it is required.
 
-**`ForgotPassword` / `ConfirmForgotPassword`**: like `SignUp`, the reset code is written to the kumolo server log (`ForgotPassword` message) instead of being emailed or texted. `ForgotPassword` requires the user to have a verified `email` or `phone_number` attribute (`email_verified`/`phone_number_verified` set to `"true"`), matching real AWS's requirement — email is preferred when both are verified. The code has no expiry (`ExpiredCodeException` is not implemented), and `PreventUserExistenceErrors` is not enforced — a missing username always returns `UserNotFoundException`.
+**`ForgotPassword` / `ConfirmForgotPassword`**: like `SignUp`, kumolo writes the reset code to the server log (`ForgotPassword` message) instead of emailing or texting it. `ForgotPassword` requires the user to have a verified `email` or `phone_number` attribute (`email_verified`/`phone_number_verified` set to `"true"`), matching real AWS's requirement — kumolo prefers email when both are verified. kumolo does not implement code expiry (`ExpiredCodeException`), and does not enforce `PreventUserExistenceErrors` — a missing username always returns `UserNotFoundException`.
 
-**`ChangePassword`**: password history policy (`PasswordHistoryPolicyViolationException`) is not applied, and the access token's OAuth scope is not checked.
+**`ChangePassword`**: kumolo does not apply password history policy (`PasswordHistoryPolicyViolationException`), and does not check the access token's OAuth scope.
 :::
 
 ### User operations

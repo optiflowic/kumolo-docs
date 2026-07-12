@@ -32,18 +32,18 @@ Operations sourced from [`internal/cognito/router.go`](https://github.com/optifl
 | `DeleteUserPool`              |     ✓     |
 | `ListUserPools`               |     ✓     |
 | `GetUserPoolMfaConfig`        |     ◐     |
-| `SetUserPoolMfaConfig`        |     —     |
+| `SetUserPoolMfaConfig`        |     ◐     |
 | `AddCustomAttributes`         |     —     |
 | `GetLogDeliveryConfiguration` |     —     |
 | `SetLogDeliveryConfiguration` |     —     |
 | `GetSigningCertificate`       |     —     |
 
 :::note
-Password policy enforcement: only minimum length (8 characters) is checked. Complexity rules (`RequireUppercase`, `RequireLowercase`, `RequireNumbers`, `RequireSymbols`) are accepted and stored but not enforced.
+Password policy enforcement: kumolo enforces minimum length (default 8 characters) and complexity rules (`RequireUppercase`, `RequireLowercase`, `RequireNumbers`, `RequireSymbols`, all default `true`) on every operation that accepts a plaintext password (`SignUp`, `AdminCreateUser`, `AdminSetUserPassword`, `RespondToAuthChallenge`'s `NEW_PASSWORD_REQUIRED`, `ConfirmForgotPassword`, `ChangePassword`). kumolo accepts and stores `PasswordHistorySize` but does not enforce it — no password history is tracked.
 
-`DeletionProtection` is accepted and stored but not enforced — pools can always be deleted in kumolo for test ergonomics.
+kumolo enforces `DeletionProtection`: `DeleteUserPool` rejects a pool with `DeletionProtection` set to `ACTIVE` (`InvalidParameterException`); unprotected pools remain deletable.
 
-`GetUserPoolMfaConfig`: `SoftwareTokenMfaConfiguration.Enabled` is always returned as `false` (TOTP is not supported). MFA is not enforced in any auth flow.
+`GetUserPoolMfaConfig` / `SetUserPoolMfaConfig`: kumolo persists only `MfaConfiguration` (`OFF`/`ON`/`OPTIONAL`). kumolo always returns `SoftwareTokenMfaConfiguration.Enabled` as `false` (TOTP is not supported), and kumolo accepts but silently ignores `SmsMfaConfiguration`/`EmailMfaConfiguration`/`WebAuthnConfiguration`. kumolo does not enforce MFA in any auth flow.
 :::
 
 ### User pool domains
@@ -92,9 +92,9 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 | `RespondToAuthChallenge`      |     ◐     |
 | `AdminInitiateAuth`           |     —     |
 | `AdminRespondToAuthChallenge` |     —     |
-| `ForgotPassword`              |     —     |
-| `ConfirmForgotPassword`       |     —     |
-| `ChangePassword`              |     —     |
+| `ForgotPassword`              |     ◐     |
+| `ConfirmForgotPassword`       |     ◐     |
+| `ChangePassword`              |     ◐     |
 | `GetTokensFromRefreshToken`   |     —     |
 | `RevokeToken`                 |     ✓     |
 | `GlobalSignOut`               |     ✓     |
@@ -115,6 +115,10 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 **`SecretHash`, `ClientMetadata`, `AnalyticsMetadata`, `UserContextData`**: accepted on all auth operations but ignored. Lambda triggers are not supported.
 
 **`RespondToAuthChallenge`**: `USERNAME` is optional in kumolo (taken from the session JWT when omitted); on real AWS it is required.
+
+**`ForgotPassword` / `ConfirmForgotPassword`**: like `SignUp`, kumolo writes the reset code to the server log (`ForgotPassword` message) instead of emailing or texting it — set `KUMOLO_LOG_LEVEL=debug` to see the code; the default `info` level logs the event without it. `ForgotPassword` requires the user to have a verified `email` or `phone_number` attribute (`email_verified`/`phone_number_verified` set to `"true"`), matching real AWS's requirement — kumolo prefers email when both are verified. kumolo does not implement code expiry (`ExpiredCodeException`), and does not enforce `PreventUserExistenceErrors` — a missing username always returns `UserNotFoundException`.
+
+**`ChangePassword`**: kumolo does not apply password history policy (`PasswordHistoryPolicyViolationException`), and does not check the access token's OAuth scope.
 :::
 
 ### User operations

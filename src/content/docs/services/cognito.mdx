@@ -44,6 +44,8 @@ Password policy enforcement: kumolo enforces minimum length (default 8 character
 kumolo enforces `DeletionProtection`: `DeleteUserPool` rejects a pool with `DeletionProtection` set to `ACTIVE` (`InvalidParameterException`); unprotected pools remain deletable.
 
 `GetUserPoolMfaConfig` / `SetUserPoolMfaConfig`: kumolo persists only `MfaConfiguration` (`OFF`/`ON`/`OPTIONAL`). kumolo always returns `SoftwareTokenMfaConfiguration.Enabled` as `false` (TOTP is not supported), and kumolo accepts but silently ignores `SmsMfaConfiguration`/`EmailMfaConfiguration`/`WebAuthnConfiguration`. kumolo does not enforce MFA in any auth flow.
+
+`AccountRecoverySetting` is accepted, stored, and returned as-is on `CreateUserPool` / `UpdateUserPool` / `DescribeUserPool`. `CreateUserPool` defaults it to `verified_phone_number` (priority 1) then `verified_email` (priority 2) when omitted, matching AWS. See `ForgotPassword` below for how it's consumed.
 :::
 
 ### User pool domains
@@ -116,7 +118,7 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 
 **`RespondToAuthChallenge`**: `USERNAME` is optional in kumolo (taken from the session JWT when omitted); on real AWS it is required.
 
-**`ForgotPassword` / `ConfirmForgotPassword`**: like `SignUp`, kumolo writes the reset code to the server log (`ForgotPassword` message) instead of emailing or texting it — set `KUMOLO_LOG_LEVEL=debug` to see the code; the default `info` level logs the event without it. `ForgotPassword` requires the user to have a verified `email` or `phone_number` attribute (`email_verified`/`phone_number_verified` set to `"true"`), matching real AWS's requirement — kumolo prefers email when both are verified. kumolo does not implement code expiry (`ExpiredCodeException`), and does not enforce `PreventUserExistenceErrors` — a missing username always returns `UserNotFoundException`.
+**`ForgotPassword` / `ConfirmForgotPassword`**: like `SignUp`, kumolo writes the reset code to the server log (`ForgotPassword` message) instead of emailing or texting it — set `KUMOLO_LOG_LEVEL=debug` to see the code; the default `info` level logs the event without it. `ForgotPassword` selects the code delivery attribute using the user pool's `AccountRecoverySetting.RecoveryMechanisms` priority order — a pool without an explicit `AccountRecoverySetting` defaults to `verified_phone_number` (priority 1) then `verified_email` (priority 2), matching AWS's default. An `admin_only` recovery mechanism disables self-service recovery entirely. If the user has no verified attribute matching an eligible mechanism, kumolo returns `InvalidParameterException`, matching real AWS's requirement. kumolo does not implement code expiry (`ExpiredCodeException`), and does not enforce `PreventUserExistenceErrors` — a missing username always returns `UserNotFoundException`.
 
 **`ChangePassword`**: kumolo does not apply password history policy (`PasswordHistoryPolicyViolationException`), and does not check the access token's OAuth scope.
 :::

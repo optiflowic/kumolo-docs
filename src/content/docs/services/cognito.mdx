@@ -110,7 +110,7 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 :::note
 **Confirmation codes**: codes issued by `SignUp` and `ResendConfirmationCode` are written to the kumolo server log instead of being sent via email or SMS. Use `AdminConfirmSignUp` in tests to skip code retrieval entirely.
 
-**Token expiry**: `ExpiresIn` (3600 s) is returned but not enforced. `TokenValidityUnits` is stored but not checked — `RefreshTokenValidity` is always interpreted as days.
+**Token expiry**: `ExpiresIn` and each token's `exp` claim reflect the requesting client's `AccessTokenValidity`/`IdTokenValidity`/`RefreshTokenValidity`, honoring `TokenValidityUnits` (defaults: hours for access/ID tokens, days for refresh tokens, matching AWS). Expiry is enforced on every authenticated request.
 
 **`SecretHash`, `ClientMetadata`, `AnalyticsMetadata`, `UserContextData`**: accepted on all auth operations but ignored. Lambda triggers are not supported.
 

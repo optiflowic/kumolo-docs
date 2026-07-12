@@ -11,10 +11,6 @@ kumolo aims for high fidelity, but some behaviors differ from real AWS by design
 
 `PreSignUp`, `PostConfirmation`, `PreAuthentication`, `PostAuthentication`, and all other Lambda trigger hooks are silently ignored. Workflows that rely on triggers to block sign-ups, enrich tokens, or send custom messages will behave differently in kumolo.
 
-**Token expiry is not enforced**
-
-`ExpiresIn` (3600 s) is returned in auth responses but tokens are accepted indefinitely. `TokenValidityUnits` and `RefreshTokenValidity` are stored but not evaluated — refresh tokens do not expire.
-
 **MFA is not enforced**
 
 MFA configuration is accepted and stored, but kumolo does not require a second factor in any auth flow. All auth challenges complete without MFA regardless of pool settings.

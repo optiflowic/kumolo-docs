@@ -105,9 +105,10 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 `InitiateAuth` supports the following auth flows:
 
 - `USER_PASSWORD_AUTH` — username and password authentication
+- `USER_SRP_AUTH` — SRP-6a authentication (used by AWS Amplify by default)
 - `REFRESH_TOKEN_AUTH` — exchange a refresh token for new tokens
 
-`RespondToAuthChallenge` supports the `NEW_PASSWORD_REQUIRED` challenge.
+`RespondToAuthChallenge` supports the `NEW_PASSWORD_REQUIRED` and `PASSWORD_VERIFIER` challenges.
 
 :::note
 **Confirmation codes**: codes issued by `SignUp` and `ResendConfirmationCode` are written to the kumolo server log instead of being sent via email or SMS. Use `AdminConfirmSignUp` in tests to skip code retrieval entirely.
@@ -117,6 +118,8 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 **`SecretHash`, `ClientMetadata`, `AnalyticsMetadata`, `UserContextData`**: accepted on all auth operations but ignored. Lambda triggers are not supported.
 
 **`RespondToAuthChallenge`**: `USERNAME` is optional in kumolo (taken from the session JWT when omitted); on real AWS it is required.
+
+**`USER_SRP_AUTH` / `PASSWORD_VERIFIER`**: implements the SRP-6a protocol AWS Amplify uses by default, so Amplify apps can point at kumolo without switching to `USER_PASSWORD_AUTH`. An unknown username fails immediately with `UserNotFoundException` at `InitiateAuth` — kumolo does not implement AWS's anti-enumeration "fake verifier" response. A `FORCE_CHANGE_PASSWORD` user completing SRP authentication receives a chained `NEW_PASSWORD_REQUIRED` challenge instead of tokens, same as `USER_PASSWORD_AUTH`.
 
 **`ForgotPassword` / `ConfirmForgotPassword`**: like `SignUp`, kumolo writes the reset code to the server log (`ForgotPassword` message) instead of emailing or texting it — set `KUMOLO_LOG_LEVEL=debug` to see the code; the default `info` level logs the event without it. `ForgotPassword` selects the code delivery attribute using the user pool's `AccountRecoverySetting.RecoveryMechanisms` priority order — a pool without an explicit `AccountRecoverySetting` defaults to `verified_phone_number` (priority 1) then `verified_email` (priority 2), matching AWS's default. An `admin_only` recovery mechanism disables self-service recovery entirely. If the user has no verified attribute matching an eligible mechanism, kumolo returns `InvalidParameterException`, matching real AWS's requirement. kumolo does not implement code expiry (`ExpiredCodeException`), and does not enforce `PreventUserExistenceErrors` — a missing username always returns `UserNotFoundException`.
 

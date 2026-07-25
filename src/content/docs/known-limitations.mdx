@@ -11,9 +11,9 @@ kumolo aims for high fidelity, but some behaviors differ from real AWS by design
 
 `PreSignUp`, `PostConfirmation`, `PreAuthentication`, `PostAuthentication`, and all other Lambda trigger hooks are silently ignored. Workflows that rely on triggers to block sign-ups, enrich tokens, or send custom messages will behave differently in kumolo.
 
-**MFA is not enforced**
+**`MfaConfiguration: "OPTIONAL"` does not gate sign-in**
 
-MFA configuration is accepted and stored, but kumolo does not require a second factor in any auth flow. All auth challenges complete without MFA regardless of pool settings.
+Pools with `MfaConfiguration: "ON"` force every unenrolled user through the `MFA_SETUP` challenge on sign-in, and enrolled users must complete `SOFTWARE_TOKEN_MFA` on every subsequent sign-in — see the Cognito service page. `MfaConfiguration: "OPTIONAL"` is accepted and stored but not enforced at sign-in; only a user's own `SetUserMFAPreference` opt-in triggers an MFA challenge in that case. kumolo has no adaptive/risk-based MFA enforcement.
 
 **Confirmation codes are written to the server log**
 

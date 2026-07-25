@@ -108,7 +108,7 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 - `USER_SRP_AUTH` — SRP-6a authentication (used by AWS Amplify by default)
 - `REFRESH_TOKEN_AUTH` — exchange a refresh token for new tokens
 
-`RespondToAuthChallenge` supports the `NEW_PASSWORD_REQUIRED` and `PASSWORD_VERIFIER` challenges.
+`RespondToAuthChallenge` supports the `NEW_PASSWORD_REQUIRED`, `PASSWORD_VERIFIER`, and `SOFTWARE_TOKEN_MFA` challenges.
 
 :::note
 **Confirmation codes**: codes issued by `SignUp` and `ResendConfirmationCode` are written to the kumolo server log instead of being sent via email or SMS. Use `AdminConfirmSignUp` in tests to skip code retrieval entirely.
@@ -120,6 +120,8 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 **`RespondToAuthChallenge`**: `USERNAME` is optional in kumolo (taken from the session JWT when omitted); on real AWS it is required.
 
 **`USER_SRP_AUTH` / `PASSWORD_VERIFIER`**: implements the SRP-6a protocol AWS Amplify uses by default, so Amplify apps can point at kumolo without switching to `USER_PASSWORD_AUTH`. An unknown username fails immediately with `UserNotFoundException` at `InitiateAuth` — kumolo does not implement AWS's anti-enumeration "fake verifier" response. A `FORCE_CHANGE_PASSWORD` user completing SRP authentication receives a chained `NEW_PASSWORD_REQUIRED` challenge instead of tokens, same as `USER_PASSWORD_AUTH`.
+
+**`SOFTWARE_TOKEN_MFA`**: issued instead of tokens whenever `USER_PASSWORD_AUTH`, `PASSWORD_VERIFIER`, or the post-`NEW_PASSWORD_REQUIRED` reset succeeds for a user with TOTP MFA enabled (see `SetUserMFAPreference` below). `RespondToAuthChallenge` verifies the submitted `SOFTWARE_TOKEN_MFA_CODE` as a TOTP code (RFC 6238, ±1 time step / ±30s clock skew) against the user's registered secret; a mismatch returns `CodeMismatchException`. On success, tokens are issued exactly as for the non-MFA path.
 
 **`ForgotPassword` / `ConfirmForgotPassword`**: like `SignUp`, kumolo writes the reset code to the server log (`ForgotPassword` message) instead of emailing or texting it — set `KUMOLO_LOG_LEVEL=debug` to see the code; the default `info` level logs the event without it. `ForgotPassword` selects the code delivery attribute using the user pool's `AccountRecoverySetting.RecoveryMechanisms` priority order — a pool without an explicit `AccountRecoverySetting` defaults to `verified_phone_number` (priority 1) then `verified_email` (priority 2), matching AWS's default. An `admin_only` recovery mechanism disables self-service recovery entirely. If the user has no verified attribute matching an eligible mechanism, kumolo returns `InvalidParameterException`, matching real AWS's requirement. kumolo does not implement code expiry (`ExpiredCodeException`), and does not enforce `PreventUserExistenceErrors` — a missing username always returns `UserNotFoundException`.
 
@@ -137,7 +139,7 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 | `GetUserAttributeVerificationCode` |     ◐     |
 | `VerifyUserAttribute`              |     ◐     |
 | `GetUserAuthFactors`               |     —     |
-| `SetUserMFAPreference`             |     —     |
+| `SetUserMFAPreference`             |     ◐     |
 | `SetUserSettings`                  |     —     |
 | `GetUICustomization`               |     —     |
 | `SetUICustomization`               |     —     |
@@ -147,6 +149,8 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 `UpdateUserAttributes`: real AWS holds a new `email`/`phone_number` value pending until verified via `VerifyUserAttribute`. kumolo has no email/SMS delivery to gate on, so it applies every attribute change immediately. Changing `email`/`phone_number` still resets the paired `email_verified`/`phone_number_verified` attribute to `false` and generates a verification code (logged at Info level, same as `SignUp`).
 
 `GetUserAttributeVerificationCode` / `VerifyUserAttribute`: `AttributeName` is restricted to `email` or `phone_number` — the only attributes kumolo tracks a verification code for.
+
+`SetUserMFAPreference`: only `SoftwareTokenMfaSettings` is persisted; `SMSMfaSettings`, `EmailMfaSettings`, and `WebAuthnMfaSettings` are accepted but silently ignored. Setting `Enabled: true` without a prior successful `VerifySoftwareToken` call is rejected with `InvalidParameterException` — kumolo requires a registered TOTP secret before it can be made the sign-in requirement. Setting `Enabled: false` clears the preferred-MFA flag but keeps the registered TOTP secret, so re-enabling doesn't require another enrollment round trip.
 :::
 
 ### Admin operations
@@ -220,12 +224,16 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 
 | Operation                      | Supported |
 | ------------------------------ | :-------: |
-| `AssociateSoftwareToken`       |     —     |
-| `VerifySoftwareToken`          |     —     |
+| `AssociateSoftwareToken`       |     ◐     |
+| `VerifySoftwareToken`          |     ◐     |
 | `StartWebAuthnRegistration`    |     —     |
 | `CompleteWebAuthnRegistration` |     —     |
 | `DeleteWebAuthnCredential`     |     —     |
 | `ListWebAuthnCredentials`      |     —     |
+
+:::note
+`AssociateSoftwareToken` / `VerifySoftwareToken`: only the AccessToken-authenticated flow is supported (an already-signed-in user enrolling MFA from a settings screen) — the Session-authenticated flow used to satisfy a forced `MFA_SETUP` challenge during sign-in is not implemented, since `InitiateAuth` never issues `MFA_SETUP`. `AssociateSoftwareToken` generates a Base32-encoded TOTP secret (RFC 4648/6238) and stores it as pending; calling it again before verifying discards the previous pending secret. `VerifySoftwareToken` checks the submitted 6-digit code against the pending secret (±1 time step / ±30s clock skew) and, on success, promotes it to the user's active TOTP secret — this only registers the authenticator, it does not enable MFA for sign-in; call `SetUserMFAPreference` to do that. A code mismatch returns `CodeMismatchException` (HTTP 400) rather than AWS's `Status: "ERROR"` response body.
+:::
 
 ### Identity providers
 

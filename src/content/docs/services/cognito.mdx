@@ -39,7 +39,7 @@ Operations sourced from [`internal/cognito/router.go`](https://github.com/optifl
 | `GetSigningCertificate`       |     —     |
 
 :::note
-Password policy enforcement: kumolo enforces minimum length (default 8 characters) and complexity rules (`RequireUppercase`, `RequireLowercase`, `RequireNumbers`, `RequireSymbols`, all default `true`) on every operation that accepts a plaintext password (`SignUp`, `AdminCreateUser`, `AdminSetUserPassword`, `RespondToAuthChallenge`'s `NEW_PASSWORD_REQUIRED`, `ConfirmForgotPassword`, `ChangePassword`). kumolo accepts and stores `PasswordHistorySize` but does not enforce it — no password history is tracked.
+Password policy enforcement: kumolo enforces minimum length (default 8 characters), AWS's 256-character maximum length, and complexity rules (`RequireUppercase`, `RequireLowercase`, `RequireNumbers`, `RequireSymbols`, all default `true`) on every operation that accepts a plaintext password (`SignUp`, `AdminCreateUser`, `AdminSetUserPassword`, `RespondToAuthChallenge`'s `NEW_PASSWORD_REQUIRED`, `ConfirmForgotPassword`, `ChangePassword`). kumolo accepts and stores `PasswordHistorySize` but does not enforce it — no password history is tracked.
 
 kumolo enforces `DeletionProtection`: `DeleteUserPool` rejects a pool with `DeletionProtection` set to `ACTIVE` (`InvalidParameterException`); unprotected pools remain deletable.
 
@@ -177,9 +177,9 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 | `AdminLinkProviderForUser`     |     —     |
 
 :::note
-`AdminCreateUser`: password complexity rules are not enforced (only minimum length is checked). `ForceAliasCreation` and `DesiredDeliveryMediums` are accepted but ignored — no invitation messages are sent.
+`AdminCreateUser`: password policy enforcement (minimum length and complexity rules) applies the same as `SignUp` — see the note above. `ForceAliasCreation` and `DesiredDeliveryMediums` are accepted but ignored — no invitation messages are sent.
 
-`AdminSetUserPassword`: password complexity rules are not enforced. Password history policy (`PasswordHistoryPolicyViolationException`) is not applied.
+`AdminSetUserPassword`: password policy enforcement applies the same as `SignUp` — see the note above. Password history policy (`PasswordHistoryPolicyViolationException`) is not applied.
 
 `AdminUpdateUserAttributes`: same immediate-apply behavior as `UpdateUserAttributes`. Admins can skip verification-code generation entirely by including `email_verified`/`phone_number_verified` set to `"true"` in the same request.
 :::

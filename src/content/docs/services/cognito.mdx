@@ -39,6 +39,17 @@ Operations sourced from [`internal/cognito/router.go`](https://github.com/optifl
 | `GetSigningCertificate`       |     —     |
 
 :::note
+`CreateUserPool` resolves the new pool's region from the caller's SigV4 credential scope
+(the region configured on the AWS SDK/CLI/Terraform provider) — falling back to the
+`AWS_REGION`/`AWS_DEFAULT_REGION` environment variables on the kumolo process, then to
+`us-east-1` if neither is set. The resolved region is baked into the pool ID's `{region}_`
+prefix and stays consistent across the pool ARN
+(`arn:aws:cognito-idp:{region}:000000000000:userpool/{poolId}`, account fixed at
+`000000000000`) and the JWT `iss` claim
+(`https://cognito-idp.{region}.amazonaws.com/{poolId}`). kumolo does not validate that the
+region is a real AWS region name; pools created before this resolution existed keep their
+original `us-east-1_...` ID.
+
 Password policy enforcement: kumolo enforces minimum length (default 8 characters), AWS's 256-character maximum length, and complexity rules (`RequireUppercase`, `RequireLowercase`, `RequireNumbers`, `RequireSymbols`, all default `true`) on every operation that accepts a plaintext password (`SignUp`, `AdminCreateUser`, `AdminSetUserPassword`, `RespondToAuthChallenge`'s `NEW_PASSWORD_REQUIRED`, `ConfirmForgotPassword`, `ChangePassword`). kumolo accepts and stores `PasswordHistorySize` but does not enforce it — no password history is tracked.
 
 kumolo enforces `DeletionProtection`: `DeleteUserPool` rejects a pool with `DeletionProtection` set to `ACTIVE` (`InvalidParameterException`); unprotected pools remain deletable.

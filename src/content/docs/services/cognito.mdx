@@ -42,8 +42,8 @@ Operations sourced from [`internal/cognito/router.go`](https://github.com/optifl
 `CreateUserPool` resolves the new pool's region from the caller's SigV4 credential scope
 (the region configured on the AWS SDK/CLI/Terraform provider) — falling back to the
 `AWS_REGION`/`AWS_DEFAULT_REGION` environment variables on the kumolo process, then to
-`us-east-1` if neither is set. The resolved region is baked into the pool ID's `{region}_`
-prefix and stays consistent across the pool ARN
+`us-east-1` if neither is set. `kumolo` uses the resolved region in the pool ID's
+`{region}_` prefix and uses the same region in the pool ARN
 (`arn:aws:cognito-idp:{region}:000000000000:userpool/{poolId}`, account fixed at
 `000000000000`) and the JWT `iss` claim
 (`https://cognito-idp.{region}.amazonaws.com/{poolId}`). kumolo does not validate that the

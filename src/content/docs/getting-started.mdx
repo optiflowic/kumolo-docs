@@ -199,16 +199,43 @@ the AWS SDK requires one to be present.
 
 ## Environment variables
 
-| Variable                    | Default  | Description                                                                                   |
-| --------------------------- | -------- | --------------------------------------------------------------------------------------------- |
-| `KUMOLO_PORT`               | `5566`   | HTTP listen port                                                                              |
-| `KUMOLO_DATA_DIR`           | _(none)_ | Persistent storage directory. If unset, a temporary directory is created and removed on exit. |
-| `KUMOLO_LOG_LEVEL`          | `info`   | Log verbosity: `debug`, `info`, `warn`, `error`                                               |
-| `KUMOLO_LIFECYCLE_INTERVAL` | `1m`     | How often S3 lifecycle rules are evaluated and enforced (environment variable only)           |
+| Variable                    | Default  | Description                                                                                                                                                                                                |
+| --------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `KUMOLO_PORT`               | `5566`   | HTTP listen port                                                                                                                                                                                           |
+| `KUMOLO_DATA_DIR`           | _(none)_ | Persistent storage directory. If unset, a temporary directory is created and removed on exit.                                                                                                              |
+| `KUMOLO_LOG_LEVEL`          | `info`   | Log verbosity: `debug`, `info`, `warn`, `error`                                                                                                                                                            |
+| `KUMOLO_LIFECYCLE_INTERVAL` | `1m`     | How often S3 lifecycle rules are evaluated and enforced (environment variable only)                                                                                                                        |
+| `KUMOLO_CORS_ALLOW_ORIGIN`  | _(none)_ | `Access-Control-Allow-Origin` value for DynamoDB, DynamoDB Streams, KMS, Cognito, and STS. Empty disables CORS support except Cognito's own default — see [Browser SPAs and CORS](#browser-spas-and-cors). |
 
-`KUMOLO_PORT`, `KUMOLO_DATA_DIR`, and `KUMOLO_LOG_LEVEL` can also be set as CLI flags using kebab-case (e.g. `-data-dir`, `-log-level`).
+`KUMOLO_PORT`, `KUMOLO_DATA_DIR`, `KUMOLO_LOG_LEVEL`, and `KUMOLO_CORS_ALLOW_ORIGIN` can also be set as CLI flags using kebab-case (e.g. `-data-dir`, `-log-level`, `-cors-allow-origin`).
 
 If a `.env` file is present in the working directory, kumolo loads it automatically on startup. CLI flags take precedence over `.env` values, which take precedence over built-in defaults.
+
+## Browser SPAs and CORS
+
+By default, kumolo's CORS support is opt-in via `KUMOLO_CORS_ALLOW_ORIGIN` — the same posture real DynamoDB, KMS, and STS take, since none of them are meant to be called directly from a browser.
+
+Cognito is the exception: real `cognito-idp` returns `Access-Control-Allow-Origin: *` unconditionally, and browser SDKs (`amazon-cognito-identity-js`, Amplify) depend on it. kumolo matches this on Cognito's _actual_ response even when `KUMOLO_CORS_ALLOW_ORIGIN` is unset.
+
+That default alone doesn't get a fully unconfigured SPA past the CORS _preflight_, though. `OPTIONS /` never carries `X-Amz-Target`, so on the shared `http://localhost:5566` endpoint kumolo can't tell a Cognito call from a DynamoDB/KMS/STS one before answering it — the preflight stays opt-in there too, to avoid letting a browser's real request reach those other, unauthenticated services.
+
+To make a Cognito SPA work with zero configuration, point its client at a convention hostname instead of the shared endpoint. `*.localhost` resolves to `127.0.0.1` with no DNS/hosts-file setup, so the `Host` header alone tells kumolo which service — and therefore which CORS policy — applies, even during the preflight:
+
+| Service          | Host                              | Default `Access-Control-Allow-Origin` |
+| ---------------- | --------------------------------- | ------------------------------------- |
+| Cognito          | `cognito-idp.localhost:5566`      | `*`                                   |
+| DynamoDB         | `dynamodb.localhost:5566`         | _(none — opt-in only)_                |
+| DynamoDB Streams | `streams.dynamodb.localhost:5566` | _(none — opt-in only)_                |
+| KMS              | `kms.localhost:5566`              | _(none — opt-in only)_                |
+| STS              | `sts.localhost:5566`              | _(none — opt-in only)_                |
+
+```go
+client := cognitoidentityprovider.NewFromConfig(cfg, func(o *cognitoidentityprovider.Options) {
+    o.BaseEndpoint = aws.String("http://cognito-idp.localhost:5566")
+})
+```
+
+The port stays `5566` — this is Host-header routing on the existing listener, not separate ports. `KUMOLO_CORS_ALLOW_ORIGIN`, when set, still overrides every service's default (including Cognito's) with the configured origin. A request's actual dispatch is pinned to whichever service its Host names, regardless of `X-Amz-Target`, so a client using one of these hostnames only ever reaches that service's router — using a convention hostname never widens access to another service.
 
 ## Troubleshooting
 

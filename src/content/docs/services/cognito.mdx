@@ -317,6 +317,18 @@ Fields omitted from `CreateUserPoolClient` and `UpdateUserPoolClient` are cleare
 | `UntagResource`       |     ✓     |
 | `ListTagsForResource` |     ✓     |
 
+## CORS
+
+Real `cognito-idp` returns `Access-Control-Allow-Origin: *` on every response with no configuration required — browser SDKs (`amazon-cognito-identity-js`, Amplify) depend on this to call it directly from a browser. kumolo matches this: Cognito's _actual_ response defaults to `Access-Control-Allow-Origin: *` even when `KUMOLO_CORS_ALLOW_ORIGIN` is unset. Setting the env var overrides the default with the configured origin instead.
+
+DynamoDB, DynamoDB Streams, KMS, and STS are not designed for direct browser use on real AWS, so kumolo keeps their CORS support opt-in via `KUMOLO_CORS_ALLOW_ORIGIN` only — Cognito is the one exception.
+
+:::note
+That default only covers the _actual_ response. The CORS preflight (`OPTIONS /`) never carries `X-Amz-Target`, so on the shared `http://localhost:5566` endpoint kumolo has no way to identify a Cognito call ahead of time — the preflight itself stays opt-in there too (`KUMOLO_CORS_ALLOW_ORIGIN` required). Answering it unconditionally would let a browser's real request reach unauthenticated DynamoDB/KMS/STS operations even though the response itself would be unreadable by the page.
+
+For a Cognito SPA to work with zero configuration, point `BaseEndpoint` at `http://cognito-idp.localhost:5566` instead of the shared endpoint — the `Host` header alone tells kumolo to apply Cognito's CORS policy, including on the preflight. See [Browser SPAs and CORS](/getting-started#browser-spas-and-cors) for the full mechanism and the equivalent hostnames for the other services.
+:::
+
 ## Quick start
 
 <Tabs>
